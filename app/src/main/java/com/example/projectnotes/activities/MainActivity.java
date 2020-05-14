@@ -3,15 +3,14 @@ package com.example.projectnotes.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.Menu;
 import android.widget.ListView;
 
 import com.example.projectnotes.R;
 import com.example.projectnotes.adapters.NotesListAdapter;
 import com.example.projectnotes.pojos.Note;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,5 +49,10 @@ public class MainActivity extends AppCompatActivity {
 
         NotesListAdapter notesListAdapter = new NotesListAdapter(this, listNotes);
         listViewNotes.setAdapter(notesListAdapter);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_settings, menu);
+        return true;
     }
 }
