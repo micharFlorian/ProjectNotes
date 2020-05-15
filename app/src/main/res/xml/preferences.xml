@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="switch_dark_theme"
+        android:title="Tema Oscuro" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_sync"
+        android:summary="@string/sync_pref_summary"
+        android:title="@string/sync_pref" />
+
+    <ListPreference
+        android:defaultValue="@string/pref_syncConnectionType_default_value"
+        android:dependency="pref_sync"
+        android:entries="@array/pref_syncConnectionType_entries"
+        android:entryValues="@array/pref_syncConnectionType_values"
+        android:key="pref_sync_connection_type"
+        android:summary="@string/pref_syncConnectionType_summary"
+        android:title="@string/pref_syncConnectionType" />
+
+    <EditTextPreference
+        android:dialogLayout="@layout/preference_reset_notes"
+        android:dialogTitle=""
+        android:key="text_reset_notes"
+        android:summary="Se restablecerán las notas de la última copia de seguridad"
+        android:title="Restablecer Notas" />
+
+    <EditTextPreference
+        android:dialogLayout="@layout/preference_password"
+        android:dialogTitle="Restablecer la contraseña"
+        android:inputType="textPassword"
+        android:key="text_password"
+        android:summary="Se restablecerá la contraseña de la cuenta"
+        android:title="Cambiar la Contraseña" />
+
+
+</PreferenceScreen>

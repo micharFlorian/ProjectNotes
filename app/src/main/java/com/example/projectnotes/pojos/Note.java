@@ -13,8 +13,16 @@ public class Note implements Serializable {
     }
 
     public Note(String title, String description) {
-        this.title = title;
-        this.description = description;
+        if (title != null && description == null) {
+            this.title = title;
+            this.description = "";
+        }else if (title == null && description != null) {
+            this.title = "";
+            this.description = description;
+        }else if (title != null && description != null){
+            this.title = title;
+            this.description = description;
+        }
     }
 
     public Note(Integer noteId, String title, String description, User userId) {
