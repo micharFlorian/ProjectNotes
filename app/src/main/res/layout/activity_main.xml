@@ -12,10 +12,10 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:background="@drawable/button_floating"
+        android:onClick="addNote"
         android:text="+"
         android:textColor="#FFFFFF"
         android:textSize="36sp"
-        android:onClick="addNote"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.904"
@@ -40,14 +40,13 @@
         android:id="@+id/editTextSearch"
         android:layout_width="300dp"
         android:layout_height="40dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/edit_text_round"
         android:drawableLeft="@android:drawable/ic_menu_search"
         android:hint="Buscar"
         android:paddingLeft="10dp"
         android:textColor="#776D6D"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.233"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewMyNotes" />
 
@@ -56,11 +55,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="80dp"
-        android:background="#FAC834"
+        android:layout_marginTop="75dp"
+        android:background="@color/colorBackground"
         app:layout_constraintStart_toEndOf="@+id/editTextSearch"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_sort_alphabetically" />
+        app:srcCompat="@drawable/ic_sort_by_alpha1"
+        tools:ignore="VectorDrawableCompat" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"

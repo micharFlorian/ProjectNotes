@@ -2,9 +2,12 @@ package com.example.projectnotes.activities;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         listViewNotes = (ListView) findViewById(R.id.listViewNotes);
@@ -69,6 +73,12 @@ public class MainActivity extends AppCompatActivity {
                 alertDialog(note);
             }
         });
+//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+//        boolean sync = preferences.getBoolean("pref_sync", true);
+//        String typeSync = preferences.getString("pref_sync_connection_type", "WiFi");
+//        String passsword = preferences.getString("text_password", "");
+//        Toast.makeText(getApplicationContext(), passsword + "", Toast.LENGTH_SHORT).show();
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
