@@ -41,7 +41,7 @@ public class NotesListAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         Note note = (Note)getItem(i);
-        view = LayoutInflater.from(context).inflate(R.layout.item_listview, null);
+        view = LayoutInflater.from(context).inflate(R.layout.listview_item, null);
         TextView textViewTitle = (TextView) view.findViewById(R.id.textViewTitle);
         TextView textViewDescription = (TextView) view.findViewById(R.id.textViewDescription);
         textViewTitle.setText(note.getTitle());

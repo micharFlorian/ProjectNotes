@@ -45,6 +45,8 @@
         android:background="@drawable/edit_text_round"
         android:drawableLeft="@android:drawable/ic_menu_search"
         android:hint="Buscar"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
         android:paddingLeft="10dp"
         android:textColor="#776D6D"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,6 +59,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="75dp"
         android:background="@color/colorBackground"
+        android:onClick="alphabeticalOrder"
         app:layout_constraintStart_toEndOf="@+id/editTextSearch"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_sort_by_alpha1"
@@ -78,10 +81,21 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <ListView
-                android:id="@+id/listViewNotes"
+<!--            <ViewStub-->
+<!--                android:id="@+id/stub_list"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:inflatedId="@+id/showlayout"-->
+<!--                android:layout="@layout/my_listview" />-->
+
+            <ViewStub
+                android:id="@+id/stub_grid"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:inflatedId="@+id/showlayout"
+                android:layout="@layout/my_gridview" />
         </LinearLayout>
 
     </RelativeLayout>

@@ -22,7 +22,7 @@ public class SettingsFragment extends PreferenceFragment {
 
         Preference preference = (Preference) findPreference("text_reset_notes");
         preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            public boolean onPreferenceClick(Preference preference) {
+            public boolean onPreferenceClick(final Preference preference) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setMessage("Las notas que se hayan creado recientemente se borrarán")
                         .setPositiveButton("Restaurar", new DialogInterface.OnClickListener() {
