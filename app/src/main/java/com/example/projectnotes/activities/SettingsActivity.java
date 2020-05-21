@@ -23,7 +23,6 @@ import com.example.projectnotes.R;
         getSupportActionBar().setTitle("Ajustes");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         if (findViewById(R.id.fragment_settings) != null) {
             if (savedInstanceState != null) {
                 return;

@@ -44,6 +44,11 @@
         <item>WiFi/Datos Móviles</item>
     </string-array>
 
+    <string-array name="pref_views_notes_entries">
+        <item>Lista</item>
+        <item>Columna</item>
+    </string-array>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

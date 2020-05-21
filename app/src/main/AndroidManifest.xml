@@ -10,11 +10,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activities.SettingsActivity"/>
-<!--            android:parentActivityName=".activities.MainActivity" />-->
+            android:name=".activities.SettingsActivity"
+            android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:name=".activities.EditTextActivity"/>
-<!--            android:parentActivityName=".activities.MainActivity" />-->
+            android:name=".activities.EditTextActivity"
+            android:parentActivityName=".activities.MainActivity" />
         <activity android:name=".activities.SplashActivity" />
         <activity android:name=".activities.RegistryActivity" />
         <activity android:name=".activities.MainActivity">

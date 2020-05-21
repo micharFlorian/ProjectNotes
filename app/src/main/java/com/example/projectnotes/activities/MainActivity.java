@@ -15,11 +15,10 @@ import android.view.View;
 import android.view.ViewStub;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,12 +36,11 @@ public class MainActivity extends AppCompatActivity {
     private ListView listViewNotes;
     private GridView gridViewNotes;
     private EditText editTextSearch;
-    private ImageButton imageButtonSearch;
     private ViewStub stubList;
     private ViewStub stubGrid;
 
     private ArrayList<Note> listNotes;
-
+    private String typeViewsNotes;
     int order = 1;
 
     @Override
@@ -50,62 +48,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editTextSearch = (EditText) findViewById(R.id.editTextSearch);
-        imageButtonSearch = (ImageButton) findViewById(R.id.imageButtonSearch);
-
-//        stubList = (ViewStub) findViewById(R.id.stub_list);
-        stubGrid = (ViewStub) findViewById(R.id.stub_grid);
-
-        stubGrid.inflate();
-//        stubList.inflate();
-
-        listViewNotes = (ListView) findViewById(R.id.listViewNotes);
-        gridViewNotes = (GridView) findViewById(R.id.gridViewNotes);
-
-        listNotes = new ArrayList<Note>() {{
-            add(new Note("Titulo 1", "Esta es una nota de prueba " +
-                    "Esta es una linea de prueba"));
-            add(new Note("AAAA", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 3", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 4", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 5", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 6", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 7", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 8", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 9", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 10", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 11", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 12", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 13", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 14", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 15", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 16", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note("Titulo 17", "Esta es una nota de prueba " +
-                    "Esta es una nota de prueba Esta es una linea de prueba" +
-                    "Esta es una nota de prueba Esta es una nota de prueba"));
-        }};
+        fill();
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             listNotes.add((Note) bundle.getSerializable("note"));
         }
 
+        readInterface();
 
-//        listViewNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                Note note = (Note) listViewNotes.getItemAtPosition(i);
-//                alertDialog(note);
-//            }
-//        });
+        stubList.inflate();
+        stubGrid.inflate();
 
-//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-//        boolean sync = preferences.getBoolean("pref_sync", true);
+        listViewNotes = (ListView) findViewById(R.id.listViewNotes);
+        gridViewNotes = (GridView) findViewById(R.id.gridViewNotes);
 
-
-//        stubList.setVisibility(View.GONE);
-//        stubGrid.setVisibility(View.VISIBLE);
-        NotesGridAdapter notesListAdapter = new NotesGridAdapter(this, R.layout.gridview_item, listNotes);
-        gridViewNotes.setAdapter(notesListAdapter);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        typeViewsNotes = preferences.getString("pref_view_notes_type", "Lista");
+        choiceViews();
 
         editTextSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -118,23 +77,77 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        listViewNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Note note = (Note) listViewNotes.getItemAtPosition(i);
+                alertDialog(note);
+            }
+        });
+
+        gridViewNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Note note = (Note) gridViewNotes.getItemAtPosition(i);
+                alertDialog(note);
+            }
+        });
+    }
+
+    private void readInterface() {
+        editTextSearch = (EditText) findViewById(R.id.editTextSearch);
+        stubList = (ViewStub) findViewById(R.id.stub_list);
+        stubGrid = (ViewStub) findViewById(R.id.stub_grid);
+    }
+
+    private void choiceViews() {
+        switch (typeViewsNotes) {
+            case "Lista":
+                stubList.setVisibility(View.VISIBLE);
+                stubGrid.setVisibility(View.GONE);
+                NotesListAdapter notesListAdapter = new NotesListAdapter(this, R.layout.listview_item, listNotes);
+                listViewNotes.setAdapter(notesListAdapter);
+                break;
+            case "Columna":
+                stubList.setVisibility(View.GONE);
+                stubGrid.setVisibility(View.VISIBLE);
+                NotesGridAdapter notesGridAdapter = new NotesGridAdapter(this, R.layout.gridview_item, listNotes);
+                gridViewNotes.setAdapter(notesGridAdapter);
+                break;
+        }
+    }
+
+    private void choiceViews(ArrayList<Note> notes) {
+        switch (typeViewsNotes) {
+            case "Lista":
+                stubList.setVisibility(View.VISIBLE);
+                stubGrid.setVisibility(View.GONE);
+                NotesListAdapter notesListAdapter = new NotesListAdapter(this, R.layout.listview_item, notes);
+                listViewNotes.setAdapter(notesListAdapter);
+                break;
+            case "Columna":
+                stubList.setVisibility(View.GONE);
+                stubGrid.setVisibility(View.VISIBLE);
+                NotesGridAdapter notesGridAdapter = new NotesGridAdapter(this, R.layout.gridview_item, notes);
+                gridViewNotes.setAdapter(notesGridAdapter);
+                break;
+        }
     }
 
     private void performSearch() {
+        ArrayList<Note> notesCopy = (ArrayList<Note>) listNotes.clone();
         if (editTextSearch.getText().toString().equals("")) {
-            NotesListAdapter notesListAdapter = new NotesListAdapter(this, listNotes);
-//            listViewNotes.setAdapter(notesListAdapter);
+            choiceViews(notesCopy);
         } else {
-            ArrayList<Note> notes = new ArrayList<>();
-            Iterator itr = listNotes.iterator();
+            ArrayList<Note> notes = new ArrayList<Note>();
+            Iterator itr = notesCopy.iterator();
             while (itr.hasNext()) {
                 Note note = (Note) itr.next();
-                if (note.getTitle().equals(editTextSearch.getText().toString())) {
+                if (note.getTitle().toLowerCase().contains(editTextSearch.getText().toString().toLowerCase())) {
                     notes.add(note);
                 }
             }
-            NotesListAdapter notesListAdapter = new NotesListAdapter(this, notes);
-//            listViewNotes.setAdapter(notesListAdapter);
+            choiceViews(notes);
         }
     }
 
@@ -182,33 +195,59 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void alphabeticalOrder(View view) {
-        NotesListAdapter notesListAdapter;
+        ArrayList<Note> listNotesCopy = (ArrayList<Note>) listNotes.clone();
         switch (order) {
             case 1:
                 order = 2;
+                ArrayList<Note> listNotesSupport = new ArrayList<>();
                 ArrayList<String> notes = new ArrayList<>();
-                Iterator itr = listNotes.iterator();
+                Iterator itr = listNotesCopy.iterator();
                 while (itr.hasNext()) {
-                    notes.add(((Note) itr.next()).getTitle());
+                    Note note = (Note) itr.next();
+                    notes.add(note.getTitle() + "," + note.getNoteId().toString());
                 }
                 Collections.sort(notes);
-                listNotes.clear();
-                Iterator itr1 = notes.iterator();
-                while (itr1.hasNext()) {
-                    Note note = new Note((String) itr1.next(), "");
-                    listNotes.add(note);
+                itr = notes.iterator();
+                while (itr.hasNext()) {
+                    String[] titleId = itr.next().toString().split(",");
+                    Iterator itrCopy = listNotesCopy.iterator();
+                    while (itrCopy.hasNext()) {
+                        Note note = (Note) itrCopy.next();
+                        if (note.getNoteId().toString().equals(titleId[1]))
+                            listNotesSupport.add(note);
+                    }
                 }
-                notesListAdapter = new NotesListAdapter(this, listNotes);
-//                listViewNotes.setAdapter(notesListAdapter);
+                choiceViews(listNotesSupport);
                 break;
             case 2:
                 order = 1;
-                Note note = new Note("prueba", "esto es una prueba");
-                listNotes.clear();
-                listNotes.add(note);
-                notesListAdapter = new NotesListAdapter(this, listNotes);
-//                listViewNotes.setAdapter(notesListAdapter);
+                choiceViews(listNotesCopy);
                 break;
         }
+    }
+
+    private void fill() {
+        listNotes = new ArrayList<Note>() {{
+            add(new Note(1, "Titulo 1", "Esta es una nota de prueba " +
+                    "Esta es una linea de prueba"));
+            add(new Note(2, "AAAA", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(3, "Titulo 3", "Prueba una nota de prueba Esta es una linea de prueba"));
+            add(new Note(4, "Titulo 4", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(5, "Titulo 5", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(6, "Titulo 6", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(7, "Titulo 7", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(8, "Titulo 8", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(9, "Titulo 9", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(10, "Titulo 10", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(11, "Titulo 11", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(12, "Titulo 12", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(13, "Titulo 13", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(14, "Titulo 14", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(15, "Titulo 15", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(16, "Titulo 16", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+            add(new Note(17, "BBBBB", "Esta es la nota B de prueba " +
+                    "Esta es una nota de prueba Esta es una linea de prueba" +
+                    "Esta es una nota de prueba Esta es una nota de prueba"));
+        }};
     }
 }

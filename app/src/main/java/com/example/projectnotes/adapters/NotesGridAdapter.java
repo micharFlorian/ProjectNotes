@@ -25,15 +25,22 @@ public class NotesGridAdapter extends ArrayAdapter<Note> {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         View v = view;
-        if(v == null){
-            LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (v == null) {
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = inflater.inflate(R.layout.gridview_item, null);
         }
-        Note note = (Note)getItem(i);
+        Note note = (Note) getItem(i);
+        TextView textViewId = (TextView) v.findViewById(R.id.textViewId);
         TextView textViewTitle = (TextView) v.findViewById(R.id.textViewTitleGrid);
         TextView textViewDescription = (TextView) v.findViewById(R.id.textViewDescriptionGrid);
-        textViewTitle.setText(note.getTitle());
-        textViewDescription.setText(note.getDescription());
+        if (note.getNoteId() != null) {
+            textViewId.setText(note.getNoteId().toString());
+            textViewTitle.setText(note.getTitle());
+            textViewDescription.setText(note.getDescription());
+        } else {
+            textViewTitle.setText(note.getTitle());
+            textViewDescription.setText(note.getDescription());
+        }
         return v;
     }
 }

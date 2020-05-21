@@ -9,6 +9,14 @@
             android:key="switch_dark_theme"
             android:title="Tema Oscuro" />
 
+        <ListPreference
+            android:defaultValue="Lista"
+            android:entries="@array/pref_views_notes_entries"
+            android:entryValues="@array/pref_views_notes_entries"
+            android:key="pref_view_notes_type"
+            android:summary="Elige la forma con la que ver las notas"
+            android:title="Tipo de vista" />
+
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_sync"

@@ -15,7 +15,7 @@ public class SplashActivity extends AppCompatActivity {
     private static int SPLASH_TIME_OUT = 2000;
     public static String nameActivity = "SplashActivity";
 
-    boolean activity = true;
+    boolean activity = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

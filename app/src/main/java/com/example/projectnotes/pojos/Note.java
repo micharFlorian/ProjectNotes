@@ -25,6 +25,12 @@ public class Note implements Serializable {
         }
     }
 
+    public Note(Integer noteId, String title, String description) {
+        this.noteId = noteId;
+        this.title = title;
+        this.description = description;
+    }
+
     public Note(Integer noteId, String title, String description, User userId) {
         this.noteId = noteId;
         this.title = title;
