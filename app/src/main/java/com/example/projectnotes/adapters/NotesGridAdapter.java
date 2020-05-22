@@ -36,11 +36,21 @@ public class NotesGridAdapter extends ArrayAdapter<Note> {
         if (note.getNoteId() != null) {
             textViewId.setText(note.getNoteId().toString());
             textViewTitle.setText(note.getTitle());
-            textViewDescription.setText(note.getDescription());
+            if (note.getDescription().length() >= 54) {
+                textViewDescription.setText(note.getDescription().substring(0, 54));
+            } else {
+                textViewDescription.setText(note.getDescription());
+            }
+
         } else {
             textViewTitle.setText(note.getTitle());
-            textViewDescription.setText(note.getDescription());
+            if (note.getDescription().length() >= 54) {
+                textViewDescription.setText(note.getDescription().substring(0, 54));
+            } else {
+                textViewDescription.setText(note.getDescription());
+            }
         }
+
         return v;
     }
 }

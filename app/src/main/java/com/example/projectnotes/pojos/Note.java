@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class Note implements Serializable {
 
+    private Integer imageId;
     private Integer noteId;
     private String title;
     private String description;
@@ -36,6 +37,21 @@ public class Note implements Serializable {
         this.title = title;
         this.description = description;
         this.userId = userId;
+    }
+
+    public Note(Integer imageId, Integer noteId, String title, String description) {
+        this.imageId = imageId;
+        this.noteId = noteId;
+        this.title = title;
+        this.description = description;
+    }
+
+    public Integer getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(Integer imageId) {
+        this.imageId = imageId;
     }
 
     public Integer getNoteId() {

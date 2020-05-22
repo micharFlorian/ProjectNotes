@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewStub;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ListView;
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             listNotes.add((Note) bundle.getSerializable("note"));
         }
 
-        readInterface();
+        init();
 
         stubList.inflate();
         stubGrid.inflate();
@@ -94,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void readInterface() {
+    private void init() {
         editTextSearch = (EditText) findViewById(R.id.editTextSearch);
         stubList = (ViewStub) findViewById(R.id.stub_list);
         stubGrid = (ViewStub) findViewById(R.id.stub_grid);
@@ -227,27 +226,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fill() {
-        listNotes = new ArrayList<Note>() {{
-            add(new Note(1, "Titulo 1", "Esta es una nota de prueba " +
-                    "Esta es una linea de prueba"));
-            add(new Note(2, "AAAA", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(3, "Titulo 3", "Prueba una nota de prueba Esta es una linea de prueba"));
-            add(new Note(4, "Titulo 4", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(5, "Titulo 5", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(6, "Titulo 6", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(7, "Titulo 7", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(8, "Titulo 8", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(9, "Titulo 9", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(10, "Titulo 10", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(11, "Titulo 11", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(12, "Titulo 12", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(13, "Titulo 13", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(14, "Titulo 14", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(15, "Titulo 15", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(16, "Titulo 16", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-            add(new Note(17, "BBBBB", "Esta es la nota B de prueba " +
-                    "Esta es una nota de prueba Esta es una linea de prueba" +
-                    "Esta es una nota de prueba Esta es una nota de prueba"));
-        }};
+        listNotes = new ArrayList<Note>();
+        listNotes.add(new Note(R.drawable.logo,1, "Titulo 1", "Esta es una nota de prueba " +
+                "Esta es una linea de prueba"));
+        listNotes.add(new Note( 2, "AAAA", "Esta es una nota de " +
+                "prueba Esta es una nota de prueba Esta es una linea de prueba"));
     }
 }

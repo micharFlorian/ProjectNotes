@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -32,17 +33,23 @@ public class EditTextActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Editor de Notas");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        editTextTitle = (EditText) findViewById(R.id.editTextTitle);
-        editTextDescription = (EditText) findViewById(R.id.editTextDescription);
-        imageView = (ImageView) findViewById(R.id.imageView);
-
+        init();
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             Note note = (Note) bundle.getSerializable("note");
             editTextTitle.setText(note.getTitle());
             editTextDescription.setText(note.getDescription());
+            if (note.getImageId() != null) {
+                imageView.setImageResource(note.getImageId());
+            }
         }
 
+    }
+
+    private void init() {
+        editTextTitle = (EditText) findViewById(R.id.editTextTitle);
+        editTextDescription = (EditText) findViewById(R.id.editTextDescription);
+        imageView = (ImageView) findViewById(R.id.imageView);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -74,19 +81,8 @@ public class EditTextActivity extends AppCompatActivity {
     }
 
     public void confirmNote(View view) {
-        if (editTextTitle.getText() != null && editTextDescription.getText() != null) {
-            Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString());
-            goMain(note);
-        } else if (editTextTitle.getText() == null && editTextDescription.getText() != null) {
-            Note note = new Note("", editTextDescription.getText().toString());
-            goMain(note);
-        } else if (editTextTitle.getText() != null && editTextDescription.getText() == null) {
-            Note note = new Note(editTextTitle.getText().toString(), "");
-            goMain(note);
-        } else if (editTextTitle.getText() == null && editTextDescription.getText() == null) {
-            Intent intent = new Intent(EditTextActivity.this, MainActivity.class);
-            startActivity(intent);
-        }
+        Note note = new Note((Integer) imageView.getTag(), 100, editTextTitle.getText().toString(), editTextDescription.getText().toString());
+        goMain(note);
     }
 
     private void goMain(Note note) {
