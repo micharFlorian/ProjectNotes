@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.projectnotes.R;
 
@@ -26,14 +25,18 @@ public class RegistryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registry);
         getSupportActionBar().hide();
 
+        init();
+
+        checkActivity();
+    }
+
+    private void init() {
         editTextEmail = (EditText) findViewById(R.id.editTextEmail);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         editTextPasswordRepeated = (EditText) findViewById(R.id.editTextPasswordRepeated);
         editTextNewPassword = (EditText) findViewById(R.id.editTextPasswordChange);
         buttonLogin = (Button) findViewById(R.id.buttonLogin);
         buttonChange = (Button) findViewById(R.id.buttonChange);
-
-        checkActivity();
     }
 
     private void checkActivity() {

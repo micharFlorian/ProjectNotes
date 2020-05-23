@@ -40,7 +40,7 @@
         <PreferenceScreen
             android:key="pref_password"
             android:summary="Se restablecerá la contraseña de la cuenta"
-            android:title="Cambiar la Contraseña">
+            android:title="Cambiar Contraseña">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:targetClass="com.example.projectnotes.activities.RegistryActivity"

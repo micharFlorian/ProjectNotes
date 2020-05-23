@@ -1,5 +1,7 @@
 package com.example.projectnotes.activities;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
@@ -7,6 +9,8 @@ import androidx.preference.PreferenceManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -30,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+
 public class MainActivity extends AppCompatActivity {
 
     private ListView listViewNotes;
@@ -41,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Note> listNotes;
     private String typeViewsNotes;
     int order = 1;
+    public static boolean isPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +98,52 @@ public class MainActivity extends AppCompatActivity {
                 alertDialog(note);
             }
         });
+
+        if (validatePermissions()) {
+            isPermission = true;
+        } else {
+            isPermission = false;
+        }
+    }
+
+    private boolean validatePermissions() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+            return true;
+        if (checkSelfPermission(READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+            return true;
+        if (shouldShowRequestPermissionRationale(READ_EXTERNAL_STORAGE)) {
+            loadRecommendationDialog();
+        } else {
+            requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, 100);
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                isPermission = true;
+            } else {
+                isPermission = false;
+            }
+        }
+    }
+
+    private void loadRecommendationDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Permisos Desactivados");
+        alertDialogBuilder.setMessage("Debe aceptar los permisos para el correcto funcionamiento" +
+                "de la aplicación");
+        alertDialogBuilder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            @Override
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            public void onClick(DialogInterface dialogInterface, int i) {
+                requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, 100);
+            }
+        });
+        alertDialogBuilder.show();
     }
 
     private void init() {
@@ -227,9 +280,26 @@ public class MainActivity extends AppCompatActivity {
 
     private void fill() {
         listNotes = new ArrayList<Note>();
-        listNotes.add(new Note(R.drawable.logo,1, "Titulo 1", "Esta es una nota de prueba " +
+        listNotes.add(new Note(R.drawable.logo, 1, "Titulo 1", "Esta es una nota de prueba " +
                 "Esta es una linea de prueba"));
-        listNotes.add(new Note( 2, "AAAA", "Esta es una nota de " +
+        listNotes.add(new Note(2, "AAAA", "Esta es una nota de " +
                 "prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(3, "Titulo 3", "Prueba una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(4, "Titulo 6", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(5, "Titulo 5", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(6, "Titulo 6", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(7, "Titulo 7", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(8, "Titulo 8", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(9, "Titulo 9", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(10, "Titulo 10", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(11, "Titulo 11", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(12, "Titulo 12", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(13, "Titulo 13", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(14, "Titulo 14", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(15, "Titulo 15", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(16, "Titulo 16", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
+        listNotes.add(new Note(17, "Titulo 4", "Esta es la nota B de prueba " +
+                "Esta es una nota de prueba Esta es una linea de prueba" +
+                "Esta es una nota de prueba Esta es una nota de prueba"));
     }
 }

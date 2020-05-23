@@ -1,21 +1,17 @@
 package com.example.projectnotes.activities;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.projectnotes.R;
 import com.example.projectnotes.pojos.Note;
@@ -60,12 +56,15 @@ public class EditTextActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_clip:
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.setType("image/");
-                startActivityForResult(intent.createChooser(intent, "Selecione la Aplicación"), 10);
+                if (MainActivity.isPermission) {
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/");
+                    startActivityForResult(intent.createChooser(intent, "Selecione la Aplicación"), 10);
+                    break;
+                }
                 break;
             case R.id.item_share:
-
+                Toast.makeText(getApplicationContext(), "Compartir nota", Toast.LENGTH_SHORT).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
