@@ -10,6 +10,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -21,6 +23,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +31,9 @@ import android.widget.Toast;
 import com.example.projectnotes.R;
 import com.example.projectnotes.adapters.NotesGridAdapter;
 import com.example.projectnotes.adapters.NotesListAdapter;
+import com.example.projectnotes.componentBd.ComponentNotes;
 import com.example.projectnotes.pojos.Note;
+import com.example.projectnotes.pojos.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
     private ListView listViewNotes;
     private GridView gridViewNotes;
     private EditText editTextSearch;
-    private ViewStub stubList;
-    private ViewStub stubGrid;
+    private ViewStub stubList, stubGrid;
 
+    private ComponentNotes componentNotes;
     private ArrayList<Note> listNotes;
     private String typeViewsNotes;
     int order = 1;
@@ -54,11 +59,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fill();
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            listNotes.add((Note) bundle.getSerializable("note"));
-        }
+        componentNotes = new ComponentNotes(this);
+
+//        fill();
+
+        listNotes = componentNotes.readNotes();
+
+//        Bundle bundle = getIntent().getExtras();
+//        if (bundle != null) {
+//            listNotes.add((Note) bundle.getSerializable("note"));
+//        }
 
         init();
 
@@ -106,6 +116,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void init() {
+        editTextSearch = (EditText) findViewById(R.id.editTextSearch);
+        stubList = (ViewStub) findViewById(R.id.stub_list);
+        stubGrid = (ViewStub) findViewById(R.id.stub_grid);
+    }
+
     private boolean validatePermissions() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return true;
@@ -144,12 +160,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         alertDialogBuilder.show();
-    }
-
-    private void init() {
-        editTextSearch = (EditText) findViewById(R.id.editTextSearch);
-        stubList = (ViewStub) findViewById(R.id.stub_list);
-        stubGrid = (ViewStub) findViewById(R.id.stub_grid);
     }
 
     private void choiceViews() {
@@ -280,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void fill() {
         listNotes = new ArrayList<Note>();
-        listNotes.add(new Note(R.drawable.logo, 1, "Titulo 1", "Esta es una nota de prueba " +
+        listNotes.add(new Note( 1, "Titulo 1", "Esta es una nota de prueba " +
                 "Esta es una linea de prueba"));
         listNotes.add(new Note(2, "AAAA", "Esta es una nota de " +
                 "prueba Esta es una nota de prueba Esta es una linea de prueba"));

@@ -3,6 +3,9 @@ package com.example.projectnotes.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,13 +17,20 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.projectnotes.R;
+import com.example.projectnotes.componentBd.ComponentNotes;
 import com.example.projectnotes.pojos.Note;
+import com.example.projectnotes.pojos.User;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class EditTextActivity extends AppCompatActivity {
 
-    private EditText editTextTitle;
-    private EditText editTextDescription;
+    private EditText editTextTitle, editTextDescription;
     private ImageView imageView;
+
+    private ComponentNotes componentNotes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,17 +39,28 @@ public class EditTextActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Editor de Notas");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        componentNotes = new ComponentNotes(this);
+
         init();
+        pickNote();
+    }
+
+    private void pickNote() {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             Note note = (Note) bundle.getSerializable("note");
             editTextTitle.setText(note.getTitle());
             editTextDescription.setText(note.getDescription());
-            if (note.getImageId() != null) {
-                imageView.setImageResource(note.getImageId());
+            Note noteImage = componentNotes.readNote(note.getNoteId());
+            if (noteImage.getImage() != null) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(noteImage.getImage(),
+                        0, noteImage.getImage().length);
+                imageView.setImageBitmap(bitmap);
+            } else {
+                Toast.makeText(getApplicationContext(), "No tiene imagen", Toast.LENGTH_SHORT).show();
             }
-        }
 
+        }
     }
 
     private void init() {
@@ -75,21 +96,35 @@ public class EditTextActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             Uri path = data.getData();
-            imageView.setImageURI(path);
+            try {
+                InputStream inputStream = getContentResolver().openInputStream(path);
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                imageView.setImageBitmap(bitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void confirmNote(View view) {
-        Note note = new Note((Integer) imageView.getTag(), 100, editTextTitle.getText().toString(), editTextDescription.getText().toString());
-        goMain(note);
+        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(),
+                imageViewToByte(imageView), new User(1));
+        componentNotes.insertNote(note);
+        goMain();
     }
 
-    private void goMain(Note note) {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("note", note);
+    private void goMain() {
         Intent intent = new Intent(EditTextActivity.this, MainActivity.class);
-        intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    private byte[] imageViewToByte(ImageView imageView) {
+
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream(20480);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        byte[] bytes = stream.toByteArray();
+        return bytes;
     }
 
 }

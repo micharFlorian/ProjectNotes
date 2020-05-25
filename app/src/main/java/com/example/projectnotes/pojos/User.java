@@ -1,16 +1,26 @@
 package com.example.projectnotes.pojos;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     private Integer userId;
     private String email;
     private String password;
 
-    public User() {
+    public User() { }
+
+    public User(Integer userId) {
+        this.userId = userId;
     }
 
     public User(Integer userId, String email, String password) {
         this.userId = userId;
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(String email, String password) {
         this.email = email;
         this.password = password;
     }

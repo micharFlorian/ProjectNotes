@@ -40,7 +40,8 @@ public class NotesListAdapter extends ArrayAdapter<Note> {
         TextView textViewDescription = (TextView) v.findViewById(R.id.textViewDescription);
         if (note.getNoteId() != null) {
             textViewId.setText(note.getNoteId().toString());
-            textViewTitle.setText(note.getTitle());
+            textViewTitle.setText(note.getNoteId().toString());
+//            textViewTitle.setText(note.getTitle());
             textViewDescription.setText(note.getDescription());
         } else {
             textViewTitle.setText(note.getTitle());

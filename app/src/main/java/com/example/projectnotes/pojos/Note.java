@@ -4,26 +4,20 @@ import java.io.Serializable;
 
 public class Note implements Serializable {
 
-    private Integer imageId;
     private Integer noteId;
     private String title;
     private String description;
+    private byte[] image;
     private User userId;
 
     public Note() {
     }
 
-    public Note(String title, String description) {
-        if (title != null && description == null) {
-            this.title = title;
-            this.description = "";
-        }else if (title == null && description != null) {
-            this.title = "";
-            this.description = description;
-        }else if (title != null && description != null){
-            this.title = title;
-            this.description = description;
-        }
+    public Note(String title, String description, byte[] image, User userId) {
+        this.title = title;
+        this.description = description;
+        this.image = image;
+        this.userId = userId;
     }
 
     public Note(Integer noteId, String title, String description) {
@@ -39,19 +33,11 @@ public class Note implements Serializable {
         this.userId = userId;
     }
 
-    public Note(Integer imageId, Integer noteId, String title, String description) {
-        this.imageId = imageId;
+    public Note(Integer noteId, String title, String description, byte[] image) {
         this.noteId = noteId;
         this.title = title;
         this.description = description;
-    }
-
-    public Integer getImageId() {
-        return imageId;
-    }
-
-    public void setImageId(Integer imageId) {
-        this.imageId = imageId;
+        this.image = image;
     }
 
     public Integer getNoteId() {
@@ -84,6 +70,14 @@ public class Note implements Serializable {
 
     public void setUserId(User userId) {
         this.userId = userId;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 
     @Override

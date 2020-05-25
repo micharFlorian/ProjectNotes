@@ -148,11 +148,37 @@
         app:layout_constraintVertical_bias="0.317" />
 
     <TextView
-        android:id="@+id/textViewIntento"
+        android:id="@+id/textViewNoMatch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Las constraseñas no coinciden"
-        android:textColor="#8F160D"
+        android:textColor="#C1170A"
+        android:textSize="18sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/buttonLogin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPasswordRepeated" />
+
+    <TextView
+        android:id="@+id/textViewEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Se deben de completar todos los campos"
+        android:textColor="#C1170A"
+        android:textSize="18sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/buttonLogin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPasswordRepeated" />
+
+    <TextView
+        android:id="@+id/textViewWrongPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contraseña incorrecta"
+        android:textColor="#C1170A"
         android:textSize="18sp"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/buttonLogin"

@@ -9,13 +9,12 @@ import android.os.Handler;
 import android.view.WindowManager;
 
 import com.example.projectnotes.R;
+import com.example.projectnotes.componentBd.ComponentNotes;
 
 public class SplashActivity extends AppCompatActivity {
 
     private static int SPLASH_TIME_OUT = 2000;
     public static String nameActivity = "SplashActivity";
-
-    boolean activity = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +24,8 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         getSupportActionBar().hide();
 
-        if (activity) {
+        ComponentNotes componentNotes = new ComponentNotes(this);
+        if (componentNotes.readUsers() == null) {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {

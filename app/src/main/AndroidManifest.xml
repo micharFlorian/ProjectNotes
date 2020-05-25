@@ -17,8 +17,8 @@
         <activity
             android:name=".activities.EditTextActivity"
             android:parentActivityName=".activities.MainActivity" />
-        <activity android:name=".activities.SplashActivity" />
         <activity android:name=".activities.RegistryActivity" />
+        <activity android:name=".activities.SplashActivity" />
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
