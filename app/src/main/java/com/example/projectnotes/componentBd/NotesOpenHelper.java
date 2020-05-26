@@ -21,7 +21,7 @@ public class NotesOpenHelper extends SQLiteOpenHelper {
 
         notes.execSQL("INSERT INTO USER(EMAIL, PASSWORD) VALUES('michar.florian@gmail.com','12345')");
         notes.execSQL("INSERT INTO NOTE(TITLE, DESCRIPTION, USER_ID) VALUES('Ejemplo','Esto es una prueba" +
-                " de la base de datos',1)");
+                " de la base de datos de la base de datos de la base de datos',1)");
     }
 
     @Override

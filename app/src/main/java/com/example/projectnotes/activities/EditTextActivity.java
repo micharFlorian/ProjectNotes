@@ -2,6 +2,7 @@ package com.example.projectnotes.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,6 +25,7 @@ import com.example.projectnotes.pojos.User;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 public class EditTextActivity extends AppCompatActivity {
 
@@ -31,6 +33,7 @@ public class EditTextActivity extends AppCompatActivity {
     private ImageView imageView;
 
     private ComponentNotes componentNotes;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +42,12 @@ public class EditTextActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Editor de Notas");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        componentNotes = new ComponentNotes(this);
-
         init();
-        pickNote();
+
+        catchNote();
     }
 
-    private void pickNote() {
+    private void catchNote() {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             Note note = (Note) bundle.getSerializable("note");
@@ -53,17 +55,18 @@ public class EditTextActivity extends AppCompatActivity {
             editTextDescription.setText(note.getDescription());
             Note noteImage = componentNotes.readNote(note.getNoteId());
             if (noteImage.getImage() != null) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(noteImage.getImage(),
-                        0, noteImage.getImage().length);
-                imageView.setImageBitmap(bitmap);
-            } else {
-                Toast.makeText(getApplicationContext(), "No tiene imagen", Toast.LENGTH_SHORT).show();
+                if (!Arrays.equals(noteImage.getImage(), imageViewToByte())) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(noteImage.getImage(),
+                            0, noteImage.getImage().length);
+                    imageView.setImageBitmap(bitmap);
+                }
             }
-
         }
     }
 
     private void init() {
+        componentNotes = new ComponentNotes(this);
+        progressDialog = new ProgressDialog(EditTextActivity.this);
         editTextTitle = (EditText) findViewById(R.id.editTextTitle);
         editTextDescription = (EditText) findViewById(R.id.editTextDescription);
         imageView = (ImageView) findViewById(R.id.imageView);
@@ -94,12 +97,14 @@ public class EditTextActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (resultCode == RESULT_OK) {
             Uri path = data.getData();
             try {
                 InputStream inputStream = getContentResolver().openInputStream(path);
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                 imageView.setImageBitmap(bitmap);
+
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -107,8 +112,11 @@ public class EditTextActivity extends AppCompatActivity {
     }
 
     public void confirmNote(View view) {
+        progressDialog.show();
+        progressDialog.setContentView(R.layout.progress_dialog);
+        progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(),
-                imageViewToByte(imageView), new User(1));
+                imageViewToByte(), new User(1));
         componentNotes.insertNote(note);
         goMain();
     }
@@ -118,13 +126,16 @@ public class EditTextActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private byte[] imageViewToByte(ImageView imageView) {
-
+    private byte[] imageViewToByte() {
         Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
         ByteArrayOutputStream stream = new ByteArrayOutputStream(20480);
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
         byte[] bytes = stream.toByteArray();
         return bytes;
     }
 
+    @Override
+    public void onBackPressed() {
+        progressDialog.dismiss();
+    }
 }

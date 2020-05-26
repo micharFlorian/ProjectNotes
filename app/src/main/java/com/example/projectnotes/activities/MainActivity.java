@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,14 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
         componentNotes = new ComponentNotes(this);
 
-//        fill();
-
-        listNotes = componentNotes.readNotes();
-
-//        Bundle bundle = getIntent().getExtras();
-//        if (bundle != null) {
-//            listNotes.add((Note) bundle.getSerializable("note"));
-//        }
+        fill();
 
         init();
 
@@ -198,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void performSearch() {
         ArrayList<Note> notesCopy = (ArrayList<Note>) listNotes.clone();
-        if (editTextSearch.getText().toString().equals("")) {
+        if (editTextSearch.getText().toString().isEmpty()) {
             choiceViews(notesCopy);
         } else {
             ArrayList<Note> notes = new ArrayList<Note>();
@@ -234,26 +229,66 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void alertDialog(final Note note) {
-        final CharSequence[] options = {"Ver o Modificar", "Cifrar", "Eliminar"};
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Seleccione una opción")
-                .setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if (options[i].equals("Ver o Modificar")) {
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("note", note);
-                            Intent intent = new Intent(MainActivity.this, EditTextActivity.class);
-                            intent.putExtras(bundle);
-                            startActivity(intent);
-                        } else if (options[i].equals("Cifrar")) {
-                            Toast.makeText(getApplicationContext(), "Nota Cifrada", Toast.LENGTH_SHORT).show();
-                        } else if (options[i].equals("Eliminar")) {
-                            Toast.makeText(getApplicationContext(), "Nota Eliminada", Toast.LENGTH_SHORT).show();
-                        }
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+        alertDialog.setTitle("PASSWORD");
+        alertDialog.setMessage("Enter Password");
+
+        final EditText input = new EditText(MainActivity.this);
+//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.MATCH_PARENT,
+//                LinearLayout.LayoutParams.MATCH_PARENT);
+//        input.setLayoutParams(lp);
+        alertDialog.setView(input);
+//        alertDialog.setIcon(R.drawable.key);
+
+        alertDialog.setPositiveButton("YES",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+//                        password = input.getText().toString();
+//                        if (password.compareTo("") == 0) {
+//                            if (pass.equals(password)) {
+//                                Toast.makeText(getApplicationContext(),
+//                                        "Password Matched", Toast.LENGTH_SHORT).show();
+//                                Intent myIntent1 = new Intent(view.getContext(),
+//                                        Show.class);
+//                                startActivityForResult(myIntent1, 0);
+//                            } else {
+//                                Toast.makeText(getApplicationContext(),
+//                                        "Wrong Password!", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
                     }
                 });
-        alertDialogBuilder.show();
+
+        alertDialog.setNegativeButton("NO",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        alertDialog.show();
+//        final CharSequence[] options = {"Ver o Modificar", "Cifrar", "Eliminar"};
+//        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+//        alertDialogBuilder.setTitle("Seleccione una opción")
+//                .setItems(options, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        if (options[i].equals("Ver o Modificar")) {
+//                            Bundle bundle = new Bundle();
+//                            bundle.putSerializable("note", note);
+//                            Intent intent = new Intent(MainActivity.this, EditTextActivity.class);
+//                            intent.putExtras(bundle);
+//                            startActivity(intent);
+//                        } else if (options[i].equals("Cifrar")) {
+//                            Toast.makeText(getApplicationContext(), "Nota Cifrada", Toast.LENGTH_SHORT).show();
+//                        } else if (options[i].equals("Eliminar")) {
+//                            Toast.makeText(getApplicationContext(), "Nota Eliminada", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                });
+//        alertDialogBuilder.show();
     }
 
     public void alphabeticalOrder(View view) {
@@ -289,27 +324,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fill() {
-        listNotes = new ArrayList<Note>();
-        listNotes.add(new Note( 1, "Titulo 1", "Esta es una nota de prueba " +
-                "Esta es una linea de prueba"));
-        listNotes.add(new Note(2, "AAAA", "Esta es una nota de " +
-                "prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(3, "Titulo 3", "Prueba una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(4, "Titulo 6", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(5, "Titulo 5", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(6, "Titulo 6", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(7, "Titulo 7", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(8, "Titulo 8", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(9, "Titulo 9", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(10, "Titulo 10", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(11, "Titulo 11", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(12, "Titulo 12", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(13, "Titulo 13", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(14, "Titulo 14", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(15, "Titulo 15", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(16, "Titulo 16", "Esta es una nota de prueba Esta es una nota de prueba Esta es una linea de prueba"));
-        listNotes.add(new Note(17, "Titulo 4", "Esta es la nota B de prueba " +
-                "Esta es una nota de prueba Esta es una linea de prueba" +
-                "Esta es una nota de prueba Esta es una nota de prueba"));
+        listNotes = componentNotes.readNotes();
     }
 }
