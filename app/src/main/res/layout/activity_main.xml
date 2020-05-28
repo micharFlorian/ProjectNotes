@@ -89,13 +89,6 @@
                 android:inflatedId="@+id/showlayout"
                 android:layout="@layout/my_listview" />
 
-            <ViewStub
-                android:id="@+id/stub_grid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:inflatedId="@+id/showlayout"
-                android:layout="@layout/my_gridview" />
         </LinearLayout>
 
     </RelativeLayout>

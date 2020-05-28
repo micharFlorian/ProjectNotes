@@ -4,14 +4,6 @@
 
     <PreferenceCategory android:title="General">
 
-        <ListPreference
-            android:defaultValue="Lista"
-            android:entries="@array/pref_views_notes_entries"
-            android:entryValues="@array/pref_views_notes_entries"
-            android:key="pref_view_notes_type"
-            android:summary="Elige la forma con la que ver las notas"
-            android:title="Tipo de vista" />
-
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_sync"
@@ -36,10 +28,10 @@
             android:key="pref_password"
             android:summary="Se restablecerá la contraseña de la cuenta"
             android:title="Cambiar Contraseña">
-<!--            <intent-->
-<!--                android:action="android.intent.action.VIEW"-->
-<!--                android:targetClass="com.example.projectnotes.activities.RegistryActivity"-->
-<!--                android:targetPackage="com.example.projectnotes" />-->
+            <!--            <intent-->
+            <!--                android:action="android.intent.action.VIEW"-->
+            <!--                android:targetClass="com.example.projectnotes.activities.RegistryActivity"-->
+            <!--                android:targetPackage="com.example.projectnotes" />-->
         </PreferenceScreen>
 
     </PreferenceCategory>

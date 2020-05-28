@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#FFFF"
+    android:orientation="vertical"
     android:paddingLeft="10dp"
     android:paddingTop="5dp"
     android:paddingRight="10dp"
@@ -17,6 +17,26 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:text="Id"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/textViewUserId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="User id"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/textViewEncode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="Encode"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="bold"
         android:visibility="invisible" />
@@ -37,7 +57,6 @@
         android:layout_below="@+id/textViewTitle"
         android:layout_alignLeft="@id/textViewTitle"
         android:layout_marginTop="10dp"
-        android:text="Description"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>

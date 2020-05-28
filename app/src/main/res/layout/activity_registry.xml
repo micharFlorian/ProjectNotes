@@ -135,10 +135,10 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="32dp"
-        android:background="@drawable/button_round"
+        android:background="@drawable/button_round_border"
         android:onClick="changePassword"
         android:text="Cambiar"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/colorPrimary"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -147,13 +147,32 @@
         app:layout_constraintTop_toBottomOf="@+id/editTextPasswordRepeated"
         app:layout_constraintVertical_bias="0.317" />
 
+    <Button
+        android:id="@+id/buttonBack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/button_round"
+        android:onClick="goToSettings"
+        android:text="Volver"
+        android:textColor="#FFFF"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonChange"
+        app:layout_constraintVertical_bias="0.317" />
+
     <TextView
         android:id="@+id/textViewNoMatch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Las constraseñas no coinciden"
         android:textColor="#C1170A"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/buttonLogin"
         app:layout_constraintEnd_toEndOf="parent"
@@ -166,7 +185,7 @@
         android:layout_height="wrap_content"
         android:text="Se deben de completar todos los campos"
         android:textColor="#C1170A"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/buttonLogin"
         app:layout_constraintEnd_toEndOf="parent"
@@ -179,10 +198,11 @@
         android:layout_height="wrap_content"
         android:text="Contraseña incorrecta"
         android:textColor="#C1170A"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/buttonLogin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextPasswordRepeated" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

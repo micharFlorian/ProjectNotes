@@ -49,6 +49,7 @@ public class SettingsFragment extends PreferenceFragment {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent intent = new Intent(getActivity(), RegistryActivity.class);
                                 startActivity(intent);
+                                getActivity().finish();
                             }
                         })
                         .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {

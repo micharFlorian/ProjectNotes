@@ -8,36 +8,27 @@ public class Note implements Serializable {
     private String title;
     private String description;
     private byte[] image;
+    private Integer encode;
     private User userId;
 
     public Note() {
     }
 
-    public Note(String title, String description, byte[] image, User userId) {
-        this.title = title;
-        this.description = description;
-        this.image = image;
-        this.userId = userId;
-    }
-
-    public Note(Integer noteId, String title, String description) {
-        this.noteId = noteId;
-        this.title = title;
-        this.description = description;
-    }
-
-    public Note(Integer noteId, String title, String description, User userId) {
-        this.noteId = noteId;
-        this.title = title;
-        this.description = description;
-        this.userId = userId;
-    }
-
-    public Note(Integer noteId, String title, String description, byte[] image) {
+    public Note(Integer noteId, String title, String description, Integer encode, byte[] image, User userId) {
         this.noteId = noteId;
         this.title = title;
         this.description = description;
         this.image = image;
+        this.encode = encode;
+        this.userId = userId;
+    }
+
+    public Note(Integer noteId, String title, String description, Integer encode, User userId) {
+        this.noteId = noteId;
+        this.title = title;
+        this.description = description;
+        this.encode = encode;
+        this.userId = userId;
     }
 
     public Integer getNoteId() {
@@ -80,13 +71,21 @@ public class Note implements Serializable {
         this.image = image;
     }
 
+    public Integer getEncode() {
+        return encode;
+    }
+
+    public void setEncode(Integer encode) {
+        this.encode = encode;
+    }
+
     @Override
     public String toString() {
         return "Note{" +
                 "noteId=" + noteId +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", userId=" + userId +
+                ", encode=" + encode +
                 '}';
     }
 }

@@ -4,17 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceManager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,20 +18,18 @@ import android.view.ViewStub;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.projectnotes.R;
-import com.example.projectnotes.adapters.NotesGridAdapter;
 import com.example.projectnotes.adapters.NotesListAdapter;
 import com.example.projectnotes.componentBd.ComponentNotes;
+import com.example.projectnotes.hash.sha;
 import com.example.projectnotes.pojos.Note;
 import com.example.projectnotes.pojos.User;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -46,36 +39,25 @@ import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 public class MainActivity extends AppCompatActivity {
 
     private ListView listViewNotes;
-    private GridView gridViewNotes;
     private EditText editTextSearch;
-    private ViewStub stubList, stubGrid;
+    private ViewStub stubList;
 
     private ComponentNotes componentNotes;
     private ArrayList<Note> listNotes;
-    private String typeViewsNotes;
-    int order = 1;
+
+    private int order = 1;
+    private final String SHA = "SHA-1";
     public static boolean isPermission;
+    public static boolean isUpdate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        componentNotes = new ComponentNotes(this);
-
-        fill();
-
         init();
 
-        stubList.inflate();
-        stubGrid.inflate();
-
-        listViewNotes = (ListView) findViewById(R.id.listViewNotes);
-        gridViewNotes = (GridView) findViewById(R.id.gridViewNotes);
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        typeViewsNotes = preferences.getString("pref_view_notes_type", "Lista");
-        choiceViews();
+        fillListView();
 
         editTextSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -92,15 +74,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Note note = (Note) listViewNotes.getItemAtPosition(i);
-                alertDialog(note);
-            }
-        });
-
-        gridViewNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Note note = (Note) gridViewNotes.getItemAtPosition(i);
-                alertDialog(note);
+                showAlertDialog(note);
             }
         });
 
@@ -112,9 +86,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
+        componentNotes = new ComponentNotes(this);
+
         editTextSearch = (EditText) findViewById(R.id.editTextSearch);
         stubList = (ViewStub) findViewById(R.id.stub_list);
-        stubGrid = (ViewStub) findViewById(R.id.stub_grid);
+
+        stubList.inflate();
+        listViewNotes = (ListView) findViewById(R.id.listViewNotes);
     }
 
     private boolean validatePermissions() {
@@ -157,54 +135,22 @@ public class MainActivity extends AppCompatActivity {
         alertDialogBuilder.show();
     }
 
-    private void choiceViews() {
-        switch (typeViewsNotes) {
-            case "Lista":
-                stubList.setVisibility(View.VISIBLE);
-                stubGrid.setVisibility(View.GONE);
-                NotesListAdapter notesListAdapter = new NotesListAdapter(this, R.layout.listview_item, listNotes);
-                listViewNotes.setAdapter(notesListAdapter);
-                break;
-            case "Columna":
-                stubList.setVisibility(View.GONE);
-                stubGrid.setVisibility(View.VISIBLE);
-                NotesGridAdapter notesGridAdapter = new NotesGridAdapter(this, R.layout.gridview_item, listNotes);
-                gridViewNotes.setAdapter(notesGridAdapter);
-                break;
-        }
-    }
-
-    private void choiceViews(ArrayList<Note> notes) {
-        switch (typeViewsNotes) {
-            case "Lista":
-                stubList.setVisibility(View.VISIBLE);
-                stubGrid.setVisibility(View.GONE);
-                NotesListAdapter notesListAdapter = new NotesListAdapter(this, R.layout.listview_item, notes);
-                listViewNotes.setAdapter(notesListAdapter);
-                break;
-            case "Columna":
-                stubList.setVisibility(View.GONE);
-                stubGrid.setVisibility(View.VISIBLE);
-                NotesGridAdapter notesGridAdapter = new NotesGridAdapter(this, R.layout.gridview_item, notes);
-                gridViewNotes.setAdapter(notesGridAdapter);
-                break;
-        }
-    }
-
     private void performSearch() {
-        ArrayList<Note> notesCopy = (ArrayList<Note>) listNotes.clone();
-        if (editTextSearch.getText().toString().isEmpty()) {
-            choiceViews(notesCopy);
-        } else {
-            ArrayList<Note> notes = new ArrayList<Note>();
-            Iterator itr = notesCopy.iterator();
-            while (itr.hasNext()) {
-                Note note = (Note) itr.next();
-                if (note.getTitle().toLowerCase().contains(editTextSearch.getText().toString().toLowerCase())) {
-                    notes.add(note);
+        if (listNotes != null) {
+            ArrayList<Note> notesCopy = (ArrayList<Note>) listNotes.clone();
+            if (editTextSearch.getText().toString().isEmpty()) {
+                fillListView(notesCopy);
+            } else {
+                ArrayList<Note> notes = new ArrayList<Note>();
+                Iterator itr = notesCopy.iterator();
+                while (itr.hasNext()) {
+                    Note note = (Note) itr.next();
+                    if (note.getTitle().toLowerCase().contains(editTextSearch.getText().toString().toLowerCase())) {
+                        notes.add(note);
+                    }
                 }
+                fillListView(notes);
             }
-            choiceViews(notes);
         }
     }
 
@@ -228,40 +174,86 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void alertDialog(final Note note) {
+    private void showAlertDialog(final Note note) {
+        switch (note.getEncode()) {
+            case 0:
+                CharSequence[] options = {"Ver o Modificar", "Ocultar contenido", "Eliminar"};
+                alertDialog(note, options);
+                break;
+            case 1:
+                alertDialogPassword(note);
+                break;
+        }
 
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-        alertDialog.setTitle("PASSWORD");
-        alertDialog.setMessage("Enter Password");
+    }
 
-        final EditText input = new EditText(MainActivity.this);
-//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-//                LinearLayout.LayoutParams.MATCH_PARENT,
-//                LinearLayout.LayoutParams.MATCH_PARENT);
-//        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-//        alertDialog.setIcon(R.drawable.key);
+    private void alertDialog(final Note note, final CharSequence[] options) {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Seleccione una opción")
+                .setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (options[i].equals("Ver o Modificar")) {
+                            isUpdate = true;
+                            User user = componentNotes.readUser(note.getUserId().getUserId());
+                            note.setUserId(user);
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("note", note);
+                            Intent intent = new Intent(MainActivity.this, EditTextActivity.class);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                        } else if (options[i].equals("Ocultar contenido")) {
+                            Note noteUpdate = componentNotes.readNote(note.getNoteId());
+                            noteUpdate.setEncode(1);
+                            if (componentNotes.updateNote(note.getNoteId(), noteUpdate) != 0) {
+                                fillListView();
+                                Toast.makeText(getApplicationContext(), "Contenido de la nota ocultado",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        } else if (options[i].equals("Mostrar contenido")) {
+                            Note noteUpdate = componentNotes.readNote(note.getNoteId());
+                            noteUpdate.setEncode(0);
+                            if (componentNotes.updateNote(note.getNoteId(), noteUpdate) != 0) {
+                                fillListView();
+                            }
+                        } else if (options[i].equals("Eliminar")) {
+                            if (componentNotes.deleteNote(note.getNoteId()) != 0) {
+                                fillListView();
+                                Toast.makeText(getApplicationContext(), "Nota Eliminada", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                });
+        alertDialogBuilder.show();
+    }
 
-        alertDialog.setPositiveButton("YES",
+    private void alertDialogPassword(final Note note) {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+        final View customLayout = getLayoutInflater().inflate(R.layout.dialog_password, null);
+        alertDialog.setView(customLayout);
+
+        alertDialog.setPositiveButton("Aceptar",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-//                        password = input.getText().toString();
-//                        if (password.compareTo("") == 0) {
-//                            if (pass.equals(password)) {
-//                                Toast.makeText(getApplicationContext(),
-//                                        "Password Matched", Toast.LENGTH_SHORT).show();
-//                                Intent myIntent1 = new Intent(view.getContext(),
-//                                        Show.class);
-//                                startActivityForResult(myIntent1, 0);
-//                            } else {
-//                                Toast.makeText(getApplicationContext(),
-//                                        "Wrong Password!", Toast.LENGTH_SHORT).show();
-//                            }
-//                        }
+                        EditText editTextPassword = customLayout.findViewById(R.id.editTextPassword);
+                        byte[] inputData = editTextPassword.getText().toString().getBytes();
+                        byte[] outputData = new byte[0];
+                        try {
+                            outputData = sha.encryptSHA(inputData, SHA);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        BigInteger shaData = new BigInteger(1, outputData);
+                        User user = componentNotes.readUser(note.getUserId().getUserId());
+                        if (user.getPassword().equals(shaData.toString(16))) {
+                            CharSequence[] options = {"Ver o Modificar", "Mostrar contenido", "Eliminar"};
+                            alertDialog(note, options);
+                        }
+
                     }
                 });
 
-        alertDialog.setNegativeButton("NO",
+        alertDialog.setNegativeButton("Cancelar",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
@@ -269,61 +261,56 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         alertDialog.show();
-//        final CharSequence[] options = {"Ver o Modificar", "Cifrar", "Eliminar"};
-//        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-//        alertDialogBuilder.setTitle("Seleccione una opción")
-//                .setItems(options, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        if (options[i].equals("Ver o Modificar")) {
-//                            Bundle bundle = new Bundle();
-//                            bundle.putSerializable("note", note);
-//                            Intent intent = new Intent(MainActivity.this, EditTextActivity.class);
-//                            intent.putExtras(bundle);
-//                            startActivity(intent);
-//                        } else if (options[i].equals("Cifrar")) {
-//                            Toast.makeText(getApplicationContext(), "Nota Cifrada", Toast.LENGTH_SHORT).show();
-//                        } else if (options[i].equals("Eliminar")) {
-//                            Toast.makeText(getApplicationContext(), "Nota Eliminada", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                });
-//        alertDialogBuilder.show();
     }
 
     public void alphabeticalOrder(View view) {
-        ArrayList<Note> listNotesCopy = (ArrayList<Note>) listNotes.clone();
-        switch (order) {
-            case 1:
-                order = 2;
-                ArrayList<Note> listNotesSupport = new ArrayList<>();
-                ArrayList<String> notes = new ArrayList<>();
-                Iterator itr = listNotesCopy.iterator();
-                while (itr.hasNext()) {
-                    Note note = (Note) itr.next();
-                    notes.add(note.getTitle() + "," + note.getNoteId().toString());
-                }
-                Collections.sort(notes);
-                itr = notes.iterator();
-                while (itr.hasNext()) {
-                    String[] titleId = itr.next().toString().split(",");
-                    Iterator itrCopy = listNotesCopy.iterator();
-                    while (itrCopy.hasNext()) {
-                        Note note = (Note) itrCopy.next();
-                        if (note.getNoteId().toString().equals(titleId[1]))
-                            listNotesSupport.add(note);
+        if (listNotes != null) {
+            ArrayList<Note> listNotesCopy = (ArrayList<Note>) listNotes.clone();
+            switch (order) {
+                case 1:
+                    order = 2;
+                    ArrayList<Note> listNotesSupport = new ArrayList<>();
+                    ArrayList<String> notes = new ArrayList<>();
+                    Iterator itr = listNotesCopy.iterator();
+                    while (itr.hasNext()) {
+                        Note note = (Note) itr.next();
+                        notes.add(note.getTitle().toLowerCase() + "," + note.getNoteId().toString());
                     }
-                }
-                choiceViews(listNotesSupport);
-                break;
-            case 2:
-                order = 1;
-                choiceViews(listNotesCopy);
-                break;
+                    Collections.sort(notes);
+                    itr = notes.iterator();
+                    while (itr.hasNext()) {
+                        String[] titleId = itr.next().toString().split(",");
+                        Iterator itrCopy = listNotesCopy.iterator();
+                        while (itrCopy.hasNext()) {
+                            Note note = (Note) itrCopy.next();
+                            if (note.getNoteId().toString().equals(titleId[1]))
+                                listNotesSupport.add(note);
+                        }
+                    }
+                    fillListView(listNotesSupport);
+                    break;
+                case 2:
+                    order = 1;
+                    fillListView(listNotesCopy);
+                    break;
+            }
         }
     }
 
-    private void fill() {
+    private void fillListView() {
         listNotes = componentNotes.readNotes();
+        if (listNotes != null) {
+            NotesListAdapter notesListAdapter = new NotesListAdapter(this,
+                    R.layout.listview_item, listNotes);
+            listViewNotes.setAdapter(notesListAdapter);
+        } else {
+            listViewNotes.setAdapter(null);
+        }
+    }
+
+    private void fillListView(ArrayList<Note> notes) {
+        NotesListAdapter notesListAdapter = new NotesListAdapter(this,
+                R.layout.listview_item, notes);
+        listViewNotes.setAdapter(notesListAdapter);
     }
 }
