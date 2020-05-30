@@ -10,5 +10,3 @@
         android:dividerHeight="2dp"
         android:paddingTop="10dp" />
 </FrameLayout>
-<!--    android:divider="@color/colorPrimary"-->
-<!--android:cacheColorHint="#00000000"-->

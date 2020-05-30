@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.projectnotes.R;
+import com.example.projectnotes.complements.TtsManager;
 import com.example.projectnotes.componentBd.ComponentNotes;
 import com.example.projectnotes.pojos.Note;
 import com.example.projectnotes.pojos.User;
@@ -38,6 +40,9 @@ public class EditTextActivity extends AppCompatActivity {
 
     private ComponentNotes componentNotes;
     private ProgressDialog progressDialog;
+    private TtsManager ttsManager = null;
+
+    private int stopTtsManager = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +55,13 @@ public class EditTextActivity extends AppCompatActivity {
 
         catchNote();
 
-        checkInsertOrUpdate();
+        checkDescription();
     }
 
-    private void checkInsertOrUpdate() {
+    private void checkDescription() {
         if (!editTextDescription.getText().toString().isEmpty()) {
+            ttsManager = new TtsManager();
+            ttsManager.init(this);
             imageButtonVolume.setVisibility(View.VISIBLE);
         } else {
             imageButtonVolume.setVisibility(View.INVISIBLE);
@@ -95,8 +102,13 @@ public class EditTextActivity extends AppCompatActivity {
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_edit_text, menu);
-        return true;
+        if (!editTextTitle.getText().toString().isEmpty() || !editTextDescription.getText().toString().isEmpty()) {
+            getMenuInflater().inflate(R.menu.menu_edit_text_share, menu);
+            return true;
+        } else {
+            getMenuInflater().inflate(R.menu.menu_edit_text_attach, menu);
+            return true;
+        }
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -113,10 +125,20 @@ public class EditTextActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.item_share:
-                Toast.makeText(getApplicationContext(), "Compartir nota", Toast.LENGTH_SHORT).show();
+                shareNote();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void shareNote() {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_TEXT, editTextTitle.getText().toString()
+                + "\n\n" + editTextDescription.getText().toString());
+        intent.setType("text/plain");
+
+        Intent shareIntent = Intent.createChooser(intent, null);
+        startActivity(shareIntent);
     }
 
     @Override
@@ -139,6 +161,7 @@ public class EditTextActivity extends AppCompatActivity {
         progressDialog.show();
         progressDialog.setContentView(R.layout.progress_dialog);
         progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
         Note note = new Note(Integer.parseInt(textViewId.getText().toString()), editTextTitle.getText().toString(),
                 editTextDescription.getText().toString(), Integer.parseInt(textViewEncode.getText().toString()),
                 imageViewToByte(), new User(Integer.parseInt(textViewUserId.getText().toString())));
@@ -164,13 +187,25 @@ public class EditTextActivity extends AppCompatActivity {
         return bytes;
     }
 
-    @Override
-    public void onBackPressed() {
-        progressDialog.dismiss();
+    public void readingDescription(View view) {
+        switch (stopTtsManager) {
+            case 0:
+                stopTtsManager = 1;
+                ttsManager.initQueue(editTextDescription.getText().toString());
+                break;
+            case 1:
+                stopTtsManager = 0;
+                ttsManager.stop();
+                break;
+        }
     }
 
-    public void readingDescription(View view) {
-        Toast.makeText(getApplicationContext(), "Prueba lectura de la descripcion",
-                Toast.LENGTH_SHORT).show();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (ttsManager != null) {
+            ttsManager.shutDown();
+        }
+        progressDialog.dismiss();
     }
 }

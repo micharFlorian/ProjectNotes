@@ -10,12 +10,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -40,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView listViewNotes;
     private EditText editTextSearch;
-    private ViewStub stubList;
 
     private ComponentNotes componentNotes;
     private ArrayList<Note> listNotes;
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private int order = 1;
     private final String SHA = "SHA-1";
     public static boolean isPermission;
-    public static boolean isUpdate = false;
+    public static boolean isUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,12 +88,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
+        isUpdate = false;
+
         componentNotes = new ComponentNotes(this);
 
         editTextSearch = (EditText) findViewById(R.id.editTextSearch);
-        stubList = (ViewStub) findViewById(R.id.stub_list);
-
-        stubList.inflate();
         listViewNotes = (ListView) findViewById(R.id.listViewNotes);
     }
 
@@ -184,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
                 alertDialogPassword(note);
                 break;
         }
-
     }
 
     private void alertDialog(final Note note, final CharSequence[] options) {

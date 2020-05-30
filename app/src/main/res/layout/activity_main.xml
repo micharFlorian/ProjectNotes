@@ -81,13 +81,12 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <ViewStub
-                android:id="@+id/stub_list"
+            <ListView
+                android:id="@+id/listViewNotes"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:inflatedId="@+id/showlayout"
-                android:layout="@layout/my_listview" />
+                android:layout_height="match_parent"
+                android:dividerHeight="2dp"
+                android:paddingTop="10dp" />
 
         </LinearLayout>
 
