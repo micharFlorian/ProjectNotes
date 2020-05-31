@@ -1,12 +1,10 @@
 package com.example.projectnotes.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-
 import com.example.projectnotes.R;
 
-    public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +20,5 @@ import com.example.projectnotes.R;
             getFragmentManager().beginTransaction().add(R.id.fragment_settings, new SettingsFragment()).commit();
             SplashActivity.nameActivity = "SettingsActivity";
         }
-
     }
-
-
 }

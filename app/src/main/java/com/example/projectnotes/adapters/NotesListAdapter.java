@@ -32,7 +32,7 @@ public class NotesListAdapter extends ArrayAdapter<Note> {
     }
 
     /**
-     * Método en el que se obtiene un Objeto de la clase Norte y se meten sus datos en el item del
+     * Método en el que se obtiene un Objeto de la clase Note y se meten sus datos en el item del
      * ListView.
      */
     @Override
