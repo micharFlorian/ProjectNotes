@@ -5,18 +5,17 @@
     <PreferenceCategory android:title="Seguridad">
 
         <PreferenceScreen
-            android:defaultValue="true"
-            android:key="pref_sync"
+            android:key="pref_backup"
             android:summary="@string/sync_pref_summary"
             android:title="@string/sync_pref" />
 
         <PreferenceScreen
-            android:key="text_reset_notes"
+            android:key="pref_reset"
             android:summary="Se restablecerán las notas de la última copia de seguridad"
             android:title="Restablecer Datos" />
 
         <PreferenceScreen
-            android:key="pref_password"
+            android:key="pref_change_password"
             android:summary="Se restablecerá la contraseña de la cuenta"
             android:title="Cambiar Contraseña"/>
 

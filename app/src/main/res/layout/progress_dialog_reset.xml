@@ -15,16 +15,17 @@
 
         <ProgressBar
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:indeterminateDrawable="@drawable/progressbar_gradient" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Guardando..."
-            android:textSize="20dp"
+            android:text="Restaurando datos..."
+            android:textSize="16dp"
             android:textStyle="bold" />
-    </LinearLayout>
 
+    </LinearLayout>
 
 </RelativeLayout>

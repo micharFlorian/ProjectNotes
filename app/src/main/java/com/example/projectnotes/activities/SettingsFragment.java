@@ -1,6 +1,7 @@
 package com.example.projectnotes.activities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -17,7 +18,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.gson.Gson;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,18 +37,22 @@ import static com.example.projectnotes.complements.DriveServiceHelper.getGoogleD
 
 public class SettingsFragment extends PreferenceFragment {
 
+    private static final String TAG = "Backup";
     private static final int REQUEST_CODE_SIGN_IN = 100;
+
+    private ProgressDialog progressDialog;
     private GoogleSignInClient googleSignInClient;
     private DriveServiceHelper driveServiceHelper;
-    private static final String TAG = "CopiaSeguridad";
-    static String idFile;
+
+    private static String idFile;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
-        Preference preferenceBackup = (Preference) findPreference("pref_sync");
+        progressDialog = new ProgressDialog(getActivity());
+        Preference preferenceBackup = (Preference) findPreference("pref_backup");
         preferenceBackup.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(final Preference preference) {
                 askGoogleCredentials();
@@ -57,21 +61,23 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
 
-        Preference preferenceResetNotes = (Preference) findPreference("text_reset_notes");
+        Preference preferenceResetNotes = (Preference) findPreference("pref_reset");
         preferenceResetNotes.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(final Preference preference) {
+                askGoogleCredentials();
                 showDialogReset();
                 return false;
             }
         });
 
-        Preference preferenceChangePassword = (Preference) findPreference("pref_password");
+        Preference preferenceChangePassword = (Preference) findPreference("pref_change_password");
         preferenceChangePassword.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(final Preference preference) {
                 showDialogChangePassword();
                 return false;
             }
         });
+
     }
 
     private void askGoogleCredentials() {
@@ -109,9 +115,10 @@ public class SettingsFragment extends PreferenceFragment {
                 .setPositiveButton("Restaurar", new DialogInterface.OnClickListener() {
                     @RequiresApi(api = Build.VERSION_CODES.O)
                     public void onClick(DialogInterface dialog, int id) {
-                        askGoogleCredentials();
+                        progressDialog.show();
+                        progressDialog.setContentView(R.layout.progress_dialog_reset);
+                        progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                         importDatabase();
-                        Toast.makeText(getActivity(), "Notas restuaradas", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -129,6 +136,9 @@ public class SettingsFragment extends PreferenceFragment {
                 .setPositiveButton("Crear", new DialogInterface.OnClickListener() {
                     @RequiresApi(api = Build.VERSION_CODES.O)
                     public void onClick(DialogInterface dialog, int id) {
+                        progressDialog.show();
+                        progressDialog.setContentView(R.layout.progress_dialog_backup);
+                        progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                         exportDatabase();
                     }
                 })
@@ -187,17 +197,14 @@ public class SettingsFragment extends PreferenceFragment {
                 .addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
                     @Override
                     public void onSuccess(List<GoogleDriveFileHolder> googleDriveFileHolders) {
-                        Gson gson = new Gson();
-                        if (googleDriveFileHolders == null) {
+                        if (googleDriveFileHolders != null && googleDriveFileHolders.size() > 0) {
                             GoogleDriveFileHolder googleDriveFileHolder = googleDriveFileHolders.get(0);
                             idFile = googleDriveFileHolder.getId();
                         }
-                        Log.d(TAG, "onSuccess2: " + idFile);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure: " + e.getMessage());
             }
         });
 
@@ -218,9 +225,9 @@ public class SettingsFragment extends PreferenceFragment {
                 .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                     @Override
                     public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
-                        Gson gson = new Gson();
-                        Log.d(TAG, "onSuccess: " + gson.toJson(googleDriveFileHolder));
                         idFile = googleDriveFileHolder.getId();
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), "Copia hecha", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -240,40 +247,42 @@ public class SettingsFragment extends PreferenceFragment {
                 .addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
                     @Override
                     public void onSuccess(List<GoogleDriveFileHolder> googleDriveFileHolders) {
-                        Gson gson = new Gson();
-                        GoogleDriveFileHolder googleDriveFileHolder = googleDriveFileHolders.get(0);
-                        idFile = googleDriveFileHolder.getId();
-                        Log.d("TAG 3", "" + idFile);
-
-                        File dir = new File("/data/data/com.example.projectnotes/databases");
-                        if (dir.isDirectory()) {
-                            String[] hijos = dir.list();
-                            for (int i = 0; i < hijos.length; i++) {
-                                new File(dir, hijos[i]).delete();
+                        if (googleDriveFileHolders != null && googleDriveFileHolders.size() > 0) {
+                            GoogleDriveFileHolder googleDriveFileHolder = googleDriveFileHolders.get(0);
+                            idFile = googleDriveFileHolder.getId();
+                            File dir = new File("/data/data/com.example.projectnotes/databases");
+                            if (dir.isDirectory()) {
+                                String[] files = dir.list();
+                                for (int i = 0; i < files.length; i++) {
+                                    new File(dir, files[i]).delete();
+                                }
+                                File fileDatabase = new File("/data/data/com.example.projectnotes/databases/notes");
+                                try {
+                                    fileDatabase.createNewFile();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                            Log.d("TAG", "Archivo Database Borrado");
-                            File ficheroDatabase = new File("/data/data/com.example.projectnotes/databases/notes");
-                            try {
-                                ficheroDatabase.createNewFile();
-                                Log.d("TAG", "Archivo Database Creado");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            Log.d("Id file", "" + idFile);
+                            driveServiceHelper.downloadFile(new java.io.File("/data/data/com.example.projectnotes/databases/", "notes"),
+                                    "" + idFile + "")
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            progressDialog.dismiss();
+                                            Toast.makeText(getActivity(), "Datos restaurados", Toast.LENGTH_SHORT).show();
+                                            Log.d(TAG, "onSuccesDownload: ");
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "onFailure: " + e.getMessage());
+                                }
+                            });
+                        } else {
+                            progressDialog.dismiss();
+                            Toast.makeText(getActivity(), "No hay copias en su cuenta", Toast.LENGTH_SHORT).show();
                         }
-                        Log.d("Id file", "" + idFile);
-                        driveServiceHelper.downloadFile(new java.io.File("/data/data/com.example.projectnotes/databases/", "notes"),
-                                "" + idFile + "")
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d(TAG, "onSuccesDownload: ");
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d(TAG, "onFailure: " + e.getMessage());
-                            }
-                        });
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override

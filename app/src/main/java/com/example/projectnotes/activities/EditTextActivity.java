@@ -2,6 +2,7 @@ package com.example.projectnotes.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,19 +31,27 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+/*
+ *Pantalla del Editor de Notas
+ */
 public class EditTextActivity extends AppCompatActivity {
 
+    //Creación de los objetos de la interfaz 
     private EditText editTextTitle, editTextDescription;
     private TextView textViewId, textViewEncode, textViewUserId;
-    private ImageView imageView;
+    private ImageView imageViewAttached, imageViewDialog;
     private ImageButton imageButtonVolume;
 
-    private ComponentNotes componentNotes;
-    private ProgressDialog progressDialog;
-    private TtsManager ttsManager = null;
+    private Dialog dialogShowImage;                 //Objeto que nos muestra un dialogo con la imagen adjuntada
+    private ComponentNotes componentNotes;          //Objeto que nos permite realizar las operaciones con la BDD
+    private ProgressDialog progressDialog;          //Objeto que nos muestra la ventana de carga
+    private TtsManager ttsManager = null;           //Objeto que nos permite la convertir el texto a voz
 
-    private int stopTtsManager = 0;
+    private int stopTtsManager = 0;                 //Variable de apoyo para parar la lectura del texto 
 
+    /*
+     *Método que crea la vista del Activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,10 +64,33 @@ public class EditTextActivity extends AppCompatActivity {
         catchNote();
 
         checkDescription();
+
+        //Espera que presionen la imagen para lanzar el método showImage()
+        imageViewAttached.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showImage();
+            }
+        });
     }
 
+    /*
+     *Se crea una ventana diálogo y  añade la imagen que se ha pinchado
+     */
+    private void showImage() {
+        dialogShowImage = new Dialog(EditTextActivity.this);
+        dialogShowImage.setContentView(R.layout.dialog_show_image);
+        imageViewDialog = dialogShowImage.findViewById(R.id.imageViewDialog);
+        imageViewDialog.setImageBitmap(((BitmapDrawable) imageViewAttached.getDrawable()).getBitmap());
+        dialogShowImage.show();
+    }
+
+    /*
+     *Comprueba que el campo de la descripción no está vacío y muestra el botón de lectura a voz
+     */
     private void checkDescription() {
         if (!editTextDescription.getText().toString().isEmpty()) {
+            //Se inicializa el obejeto ttsManager y se llama al metodo init() para inicializar los atributos de la clase
             ttsManager = new TtsManager();
             ttsManager.init(this);
             imageButtonVolume.setVisibility(View.VISIBLE);
@@ -68,9 +99,14 @@ public class EditTextActivity extends AppCompatActivity {
         }
     }
 
+    /*
+     *Captura una nota, si se ha mandado desde el MainActivity, y se meten los valores de la nota
+     * en la pantalla
+     */
     private void catchNote() {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
+            //Se obtiene el la nota del objeto Bundle y se ñadden los valores a la interfaz
             Note note = (Note) bundle.getSerializable("note");
             Note noteImage = componentNotes.readNote(note.getNoteId());
             editTextTitle.setText(note.getTitle());
@@ -78,16 +114,22 @@ public class EditTextActivity extends AppCompatActivity {
             textViewId.setText(noteImage.getNoteId().toString());
             textViewEncode.setText(noteImage.getEncode().toString());
             textViewUserId.setText(noteImage.getUserId().getUserId().toString());
+            
+            //Se comprueba que la nota tiene una imagen
             if (noteImage.getImage() != null) {
                 if (!Arrays.equals(noteImage.getImage(), imageViewToByte())) {
+                    //Se convierte el byte[] a Bitmap y se añaden a la imagen de la pantalla
                     Bitmap bitmap = BitmapFactory.decodeByteArray(noteImage.getImage(),
                             0, noteImage.getImage().length);
-                    imageView.setImageBitmap(bitmap);
+                    imageViewAttached.setImageBitmap(bitmap);
                 }
             }
         }
     }
 
+    /*
+     *Se inicializan todos los obejetos de la interfaz, el objeto componentNotes y el progressDialog
+     */
     private void init() {
         componentNotes = new ComponentNotes(this);
         progressDialog = new ProgressDialog(EditTextActivity.this);
@@ -98,7 +140,7 @@ public class EditTextActivity extends AppCompatActivity {
         textViewEncode = (TextView) findViewById(R.id.textViewEncode);
         textViewUserId = (TextView) findViewById(R.id.textViewUserId);
         imageButtonVolume = (ImageButton) findViewById(R.id.imageButtonVolume);
-        imageView = (ImageView) findViewById(R.id.imageView);
+        imageViewAttached = (ImageView) findViewById(R.id.imageView);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -137,7 +179,7 @@ public class EditTextActivity extends AppCompatActivity {
                 + "\n\n" + editTextDescription.getText().toString());
         intent.setType("text/plain");
 
-        Intent shareIntent = Intent.createChooser(intent, null);
+        Intent shareIntent = Intent.createChooser(intent, "Elige la aplicación");
         startActivity(shareIntent);
     }
 
@@ -150,7 +192,7 @@ public class EditTextActivity extends AppCompatActivity {
             try {
                 InputStream inputStream = getContentResolver().openInputStream(path);
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                imageView.setImageBitmap(bitmap);
+                imageViewAttached.setImageBitmap(bitmap);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -159,7 +201,7 @@ public class EditTextActivity extends AppCompatActivity {
 
     public void confirmNote(View view) {
         progressDialog.show();
-        progressDialog.setContentView(R.layout.progress_dialog);
+        progressDialog.setContentView(R.layout.progress_dialog_save);
         progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
         Note note = new Note(Integer.parseInt(textViewId.getText().toString()), editTextTitle.getText().toString(),
@@ -180,7 +222,7 @@ public class EditTextActivity extends AppCompatActivity {
     }
 
     private byte[] imageViewToByte() {
-        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        Bitmap bitmap = ((BitmapDrawable) imageViewAttached.getDrawable()).getBitmap();
         ByteArrayOutputStream stream = new ByteArrayOutputStream(20480);
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
         byte[] bytes = stream.toByteArray();
