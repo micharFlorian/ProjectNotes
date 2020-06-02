@@ -90,6 +90,7 @@ public class EditTextActivity extends AppCompatActivity {
      */
     private void checkDescription() {
         if (!editTextDescription.getText().toString().isEmpty()) {
+
             //Se inicializa el obejeto ttsManager y se llama al metodo init() para inicializar los atributos de la clase
             ttsManager = new TtsManager();
             ttsManager.init(this);
@@ -106,6 +107,7 @@ public class EditTextActivity extends AppCompatActivity {
     private void catchNote() {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
+
             //Se obtiene el la nota del objeto Bundle y se ñadden los valores a la interfaz
             Note note = (Note) bundle.getSerializable("note");
             Note noteImage = componentNotes.readNote(note.getNoteId());
@@ -114,7 +116,7 @@ public class EditTextActivity extends AppCompatActivity {
             textViewId.setText(noteImage.getNoteId().toString());
             textViewEncode.setText(noteImage.getEncode().toString());
             textViewUserId.setText(noteImage.getUserId().getUserId().toString());
-            
+
             //Se comprueba que la nota tiene una imagen
             if (noteImage.getImage() != null) {
                 if (!Arrays.equals(noteImage.getImage(), imageViewToByte())) {
@@ -143,6 +145,9 @@ public class EditTextActivity extends AppCompatActivity {
         imageViewAttached = (ImageView) findViewById(R.id.imageView);
     }
 
+    /*
+     *Se crean los botones del menú del ActionBar
+     */
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!editTextTitle.getText().toString().isEmpty() || !editTextDescription.getText().toString().isEmpty()) {
             getMenuInflater().inflate(R.menu.menu_edit_text_share, menu);
@@ -153,19 +158,16 @@ public class EditTextActivity extends AppCompatActivity {
         }
     }
 
+    /*
+     *Comprobamos cual de los botones del ActionBar ha sido selecionado y la lanzamos la funcion correspondiente
+     */
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
             case R.id.item_clip:
-                if (MainActivity.isPermission) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/");
-                    startActivityForResult(intent.createChooser(intent, "Selecione la Aplicación"), 10);
-                    break;
-                } else {
-                    Toast.makeText(getApplicationContext(), "La aplicación no tiene permisos " +
-                            "para abrir la galería", Toast.LENGTH_SHORT).show();
-                }
+                openGalery();
                 break;
+
             case R.id.item_share:
                 shareNote();
                 break;
@@ -173,6 +175,24 @@ public class EditTextActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
+     *Abrimos la galería del dispositivo
+     */
+    private void openGalery() {
+        if (MainActivity.isPermission) {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.setType("image/");
+            startActivityForResult(intent.createChooser(intent, "Selecione la Aplicación"), 10);
+        } else {
+            Toast.makeText(getApplicationContext(), "La aplicación no tiene permisos " +
+                    "para abrir la galería", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /*
+     *Leemos el titulo y la descripcion de la nota para mandarla como texto plano a la aplicacion
+     * que elija el usuario
+     */
     private void shareNote() {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT, editTextTitle.getText().toString()
@@ -183,6 +203,9 @@ public class EditTextActivity extends AppCompatActivity {
         startActivity(shareIntent);
     }
 
+    /*
+     *Capturamos la imagen que elieg el usaurio y la mostramos en el ImageView de la pantalla
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -199,7 +222,12 @@ public class EditTextActivity extends AppCompatActivity {
         }
     }
 
+    /*
+     *Se crea una nota con los datos que se han metido en la interfaz, dependiendo de la variable isUpdate
+     * hacemos un update de la nota o un insert
+     */
     public void confirmNote(View view) {
+
         progressDialog.show();
         progressDialog.setContentView(R.layout.progress_dialog_save);
         progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
@@ -207,20 +235,28 @@ public class EditTextActivity extends AppCompatActivity {
         Note note = new Note(Integer.parseInt(textViewId.getText().toString()), editTextTitle.getText().toString(),
                 editTextDescription.getText().toString(), Integer.parseInt(textViewEncode.getText().toString()),
                 imageViewToByte(), new User(Integer.parseInt(textViewUserId.getText().toString())));
+
         if (MainActivity.isUpdate) {
             componentNotes.updateNote(note.getNoteId(), note);
         } else {
             componentNotes.insertNote(note);
         }
+
         goMain();
     }
 
+    /*
+     *Nos lleva al MainActivity
+     */
     private void goMain() {
         Intent intent = new Intent(EditTextActivity.this, MainActivity.class);
         startActivity(intent);
         finish();
     }
 
+    /*
+     *Convertimos un ImageView en un byte[]
+     */
     private byte[] imageViewToByte() {
         Bitmap bitmap = ((BitmapDrawable) imageViewAttached.getDrawable()).getBitmap();
         ByteArrayOutputStream stream = new ByteArrayOutputStream(20480);
@@ -229,10 +265,14 @@ public class EditTextActivity extends AppCompatActivity {
         return bytes;
     }
 
+    /*
+     *Dependiendo de la variable stopTtsManager inciamos la lectura a voz o la paramos
+     */
     public void readingDescription(View view) {
         switch (stopTtsManager) {
             case 0:
                 stopTtsManager = 1;
+                //le pasamos el string que queremos que convierta a voz el Objeto ttsManager
                 ttsManager.initQueue(editTextDescription.getText().toString());
                 break;
             case 1:
@@ -242,6 +282,9 @@ public class EditTextActivity extends AppCompatActivity {
         }
     }
 
+    /*
+     *Cuando el activity se destruye apagamos el objeto ttsManager para que no consuma recursos del sistema
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();

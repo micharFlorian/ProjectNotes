@@ -2,8 +2,11 @@ package com.example.projectnotes.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
@@ -34,7 +37,9 @@ import java.util.List;
 
 import static com.example.projectnotes.complements.DriveServiceHelper.getGoogleDriveService;
 
-
+/*
+ *Clase donde se carga la interfaz
+ */
 public class SettingsFragment extends PreferenceFragment {
 
     private static final String TAG = "Backup";
@@ -46,12 +51,17 @@ public class SettingsFragment extends PreferenceFragment {
 
     private static String idFile;
 
+    /*
+     *Se carga la vista de la pantalla de Ajustes y se leen todas las PreferenceScreen de la pantalla
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
         progressDialog = new ProgressDialog(getActivity());
+
+        //Se crean e inicializan las Preference
         Preference preferenceBackup = (Preference) findPreference("pref_backup");
         preferenceBackup.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(final Preference preference) {
@@ -80,6 +90,10 @@ public class SettingsFragment extends PreferenceFragment {
 
     }
 
+    /*
+     *Cuando el usuario seleciona alguno de los botones de backup o reset se piden las credenciales al
+     * usaurio si antes no se habían pedido
+     */
     private void askGoogleCredentials() {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -91,6 +105,9 @@ public class SettingsFragment extends PreferenceFragment {
         }
     }
 
+    /*
+     *Se muestra una ventana al usuario y se da aceptar se lanza la pantalla de cambiar la contraseña
+     */
     private void showDialogChangePassword() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("¿Quiere cambiar la contraseña?")
@@ -109,6 +126,9 @@ public class SettingsFragment extends PreferenceFragment {
         builder.show();
     }
 
+    /*
+     *Se muestra una ventana al usuario y se lanza el método de resetDatabase()
+     */
     private void showDialogReset() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Los datos que se hayan ingresado recientemente se perderán")
@@ -118,7 +138,7 @@ public class SettingsFragment extends PreferenceFragment {
                         progressDialog.show();
                         progressDialog.setContentView(R.layout.progress_dialog_reset);
                         progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                        importDatabase();
+                        resetDatabase();
                     }
                 })
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -129,6 +149,9 @@ public class SettingsFragment extends PreferenceFragment {
         builder.show();
     }
 
+    /*
+     *Se muestra una ventana al usuario y se lanza el método de backupDatabase()
+     */
     private void showDialogBackup() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Se creará una copia de seguridad de todos los datos y se guardará en" +
@@ -139,7 +162,7 @@ public class SettingsFragment extends PreferenceFragment {
                         progressDialog.show();
                         progressDialog.setContentView(R.layout.progress_dialog_backup);
                         progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                        exportDatabase();
+                        backupDatabase();
                     }
                 })
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -150,6 +173,9 @@ public class SettingsFragment extends PreferenceFragment {
         builder.show();
     }
 
+    /*
+     *Leemos la cuenta que con la que usuario quiere hacer las copias de seguridad
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         switch (requestCode) {
@@ -162,6 +188,9 @@ public class SettingsFragment extends PreferenceFragment {
         super.onActivityResult(requestCode, resultCode, resultData);
     }
 
+    /*
+     *Recoge la cuenta con la que se ha iniciado sesión y se le pasa al atributo driveServiceHelper
+     */
     private void handleSignInResult(Intent result) {
         GoogleSignIn.getSignedInAccountFromIntent(result)
                 .addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
@@ -178,6 +207,9 @@ public class SettingsFragment extends PreferenceFragment {
                 });
     }
 
+    /*
+     *Se crea el tipo de inicio de sesión que  ve el usuario de la aplicacion
+     */
     private GoogleSignInClient buildGoogleSignInClient() {
         GoogleSignInOptions signInOptions =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -187,108 +219,140 @@ public class SettingsFragment extends PreferenceFragment {
         return GoogleSignIn.getClient(getActivity(), signInOptions);
     }
 
+    /*
+     *Leemos el fichero de la base de datos en el dispositivo del usuario y lo subimos al Drive
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void exportDatabase() {
+    private void backupDatabase() {
         if (driveServiceHelper == null) {
             return;
         }
 
-        driveServiceHelper.searchFile("notes", "application/octet-stream")
-                .addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
-                    @Override
-                    public void onSuccess(List<GoogleDriveFileHolder> googleDriveFileHolders) {
-                        if (googleDriveFileHolders != null && googleDriveFileHolders.size() > 0) {
-                            GoogleDriveFileHolder googleDriveFileHolder = googleDriveFileHolders.get(0);
-                            idFile = googleDriveFileHolder.getId();
+        if (isConnected()) {
+
+            //Comprobamos si ya hay un fichero de copia de seguridad en la cuenta de Google Drive
+            driveServiceHelper.searchFile("notes", "application/octet-stream")
+                    .addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
+                        @Override
+                        public void onSuccess(List<GoogleDriveFileHolder> googleDriveFileHolders) {
+                            if (googleDriveFileHolders != null && googleDriveFileHolders.size() > 0) {
+                                GoogleDriveFileHolder googleDriveFileHolder = googleDriveFileHolders.get(0);
+                                idFile = googleDriveFileHolder.getId();
+                            }
                         }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-            }
-        });
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                }
+            });
 
-        driveServiceHelper.deleteFolderFile(idFile).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "onSuccesDelete");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure: " + e.getMessage());
-            }
-        });
+            //En caso de haber ya un fichero en la cuenta, lo borramos
+            driveServiceHelper.deleteFolderFile(idFile);
 
-        driveServiceHelper.uploadFile(new java.io.File("/data/data/com.example.projectnotes/databases/", "notes"),
-                "application/octet-stream", null)
-                .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-                    @Override
-                    public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
-                        idFile = googleDriveFileHolder.getId();
-                        progressDialog.dismiss();
-                        Toast.makeText(getActivity(), "Copia hecha", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "onFailure: " + e.getMessage());
-                    }
-                });
+            //Subimos a la cuenta el fichero de la base de datos que esta en local
+            driveServiceHelper.uploadFile(new java.io.File("/data/data/com.example.projectnotes/databases/", "notes"),
+                    "application/octet-stream", null)
+                    .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
+                        @Override
+                        public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
+                            idFile = googleDriveFileHolder.getId();
+                            progressDialog.dismiss();
+                            Toast.makeText(getActivity(), "Copia hecha", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getActivity(), "Hubo un problema con la copia",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            progressDialog.dismiss();
+            Toast.makeText(getActivity(), "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
+        }
     }
 
+    /*
+     *Leemos el fichero de copia de seguridad de la nube y sobreescrimos el que tenemos en local
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void importDatabase() {
+    public void resetDatabase() {
         if (driveServiceHelper == null) {
             return;
         }
-        driveServiceHelper.searchFile("notes", "application/octet-stream")
-                .addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
-                    @Override
-                    public void onSuccess(List<GoogleDriveFileHolder> googleDriveFileHolders) {
-                        if (googleDriveFileHolders != null && googleDriveFileHolders.size() > 0) {
-                            GoogleDriveFileHolder googleDriveFileHolder = googleDriveFileHolders.get(0);
-                            idFile = googleDriveFileHolder.getId();
-                            File dir = new File("/data/data/com.example.projectnotes/databases");
-                            if (dir.isDirectory()) {
-                                String[] files = dir.list();
-                                for (int i = 0; i < files.length; i++) {
-                                    new File(dir, files[i]).delete();
+        if (isConnected()) {
+
+            //Buscamos el fichero en la nube y lo leemos
+            driveServiceHelper.searchFile("notes", "application/octet-stream")
+                    .addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
+                        @Override
+                        public void onSuccess(List<GoogleDriveFileHolder> googleDriveFileHolders) {
+                            if (googleDriveFileHolders != null && googleDriveFileHolders.size() > 0) {
+
+                                GoogleDriveFileHolder googleDriveFileHolder = googleDriveFileHolders.get(0);
+                                idFile = googleDriveFileHolder.getId();
+                                File dir = new File("/data/data/com.example.projectnotes/databases");
+                                if (dir.isDirectory()) {
+                                    String[] files = dir.list();
+                                    for (int i = 0; i < files.length; i++) {
+                                        new File(dir, files[i]).delete();
+                                    }
+                                    File fileDatabase = new File("/data/data/com.example.projectnotes/databases/notes");
+                                    try {
+                                        fileDatabase.createNewFile();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                                File fileDatabase = new File("/data/data/com.example.projectnotes/databases/notes");
-                                try {
-                                    fileDatabase.createNewFile();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+
+                                //Descargamos el fichero y sobreescribimos el que tenemos en local
+                                driveServiceHelper.downloadFile(new java.io.File("/data/data/com.example.projectnotes/databases/", "notes"),
+                                        "" + idFile + "")
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                progressDialog.dismiss();
+                                                Toast.makeText(getActivity(), "Datos restaurados", Toast.LENGTH_SHORT).show();
+                                                Log.d(TAG, "onSuccesDownload: ");
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.d(TAG, "onFailure: " + e.getMessage());
+                                    }
+                                });
+                            } else {
+                                progressDialog.dismiss();
+                                Toast.makeText(getActivity(), "No hay copias en su cuenta",
+                                        Toast.LENGTH_SHORT).show();
                             }
-                            Log.d("Id file", "" + idFile);
-                            driveServiceHelper.downloadFile(new java.io.File("/data/data/com.example.projectnotes/databases/", "notes"),
-                                    "" + idFile + "")
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            progressDialog.dismiss();
-                                            Toast.makeText(getActivity(), "Datos restaurados", Toast.LENGTH_SHORT).show();
-                                            Log.d(TAG, "onSuccesDownload: ");
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "onFailure: " + e.getMessage());
-                                }
-                            });
-                        } else {
-                            progressDialog.dismiss();
-                            Toast.makeText(getActivity(), "No hay copias en su cuenta", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure: " + e.getMessage());
-            }
-        });
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getActivity(), "Hubo un problema con la copia",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            progressDialog.dismiss();
+            Toast.makeText(getActivity(), "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /*
+     *Comprobamos si tenemos algún tipo de conexión y si hay acceso a Internet
+     */
+    private boolean isConnected() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -26,22 +26,31 @@ import java.util.concurrent.Executors;
 
 import javax.annotation.Nullable;
 
-
+/*
+ *Clase que realiza la conexión de la app con Google Drive y con la que manejamos las copias de seguridad
+ */
 public class DriveServiceHelper {
 
-    private final Executor mExecutor = Executors.newSingleThreadExecutor();
-    private final Drive mDriveService;
+    private final Executor executor = Executors.newSingleThreadExecutor();
+    private final Drive drive;
 
+    /*
+     *Metodo constructor que inicializa el atributo drive
+     */
     public DriveServiceHelper(Drive driveService) {
-
-        mDriveService = driveService;
+        drive = driveService;
     }
 
+    /*
+     *Obtiene las credenciales de Google y comienza la conexión con Google Drive
+     */
     public static Drive getGoogleDriveService(Context context, GoogleSignInAccount account, String appName) {
+
         GoogleAccountCredential credential =
                 GoogleAccountCredential.usingOAuth2(
                         context, Collections.singleton(DriveScopes.DRIVE_FILE));
         credential.setSelectedAccount(account.getAccount());
+
         Drive googleDriveService =
                 new Drive.Builder(
                         AndroidHttp.newCompatibleTransport(),
@@ -52,37 +61,44 @@ public class DriveServiceHelper {
         return googleDriveService;
     }
 
+    /*
+     *Borra un fichero a la cuenta de Google Drive
+     */
     public Task<Void> deleteFolderFile(final String fileId) {
-        return Tasks.call(mExecutor, new Callable<Void>() {
+        return Tasks.call(executor, new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 // Retrieve the metadata as a File object.
                 if (fileId != null) {
-                    mDriveService.files().delete(fileId).execute();
+                    drive.files().delete(fileId).execute();
                 }
                 return null;
             }
         });
     }
 
-    public Task<GoogleDriveFileHolder> uploadFile(final java.io.File localFile, final String mimeType, @Nullable final String folderId) {
-        return Tasks.call(mExecutor, new Callable<GoogleDriveFileHolder>() {
+    /*
+     *Sube un fichero a la cuenta de Google Drive
+     */
+    public Task<GoogleDriveFileHolder> uploadFile(final java.io.File localFile, final String mimeType,
+                                                  @Nullable final String folderId) {
+        return Tasks.call(executor, new Callable<GoogleDriveFileHolder>() {
             @Override
             public GoogleDriveFileHolder call() throws Exception {
-                // Retrieve the metadata as a File object.
                 List<String> root;
                 if (folderId == null) {
                     root = Collections.singletonList("root");
                 } else {
                     root = Collections.singletonList(folderId);
                 }
+
                 File metadata = new File()
                         .setParents(root)
                         .setMimeType(mimeType)
                         .setName(localFile.getName());
 
                 FileContent fileContent = new FileContent(mimeType, localFile);
-                File fileMeta = mDriveService.files().create(metadata, fileContent).execute();
+                File fileMeta = drive.files().create(metadata, fileContent).execute();
                 GoogleDriveFileHolder googleDriveFileHolder = new GoogleDriveFileHolder();
                 googleDriveFileHolder.setId(fileMeta.getId());
                 googleDriveFileHolder.setName(fileMeta.getName());
@@ -91,13 +107,16 @@ public class DriveServiceHelper {
         });
     }
 
+    /*
+     *Busca un fichero en la cuenta de Google Drive
+     */
     public Task<List<GoogleDriveFileHolder>> searchFile(final String fileName, final String mimeType) {
-        return Tasks.call(mExecutor, new Callable<List<GoogleDriveFileHolder>>() {
+        return Tasks.call(executor, new Callable<List<GoogleDriveFileHolder>>() {
             @Override
             public List<GoogleDriveFileHolder> call() throws Exception {
                 List<GoogleDriveFileHolder> googleDriveFileHolderList = new ArrayList<>();
-                // Retrive the metadata as a File object.
-                FileList result = mDriveService.files().list()
+
+                FileList result = drive.files().list()
                         .setQ("name = '" + fileName + "' and mimeType ='" + mimeType + "'")
                         .setSpaces("drive")
                         .setFields("files(id, name,size,createdTime,modifiedTime,starred)")
@@ -122,13 +141,15 @@ public class DriveServiceHelper {
         });
     }
 
+    /*
+     *Descarga un fichero de la cuenta de Google Drive
+     */
     public Task<Void> downloadFile(final java.io.File fileSaveLocation, final String fileId) {
-        return Tasks.call(mExecutor, new Callable<Void>() {
+        return Tasks.call(executor, new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                // Retrieve the metadata as a File object.
                 OutputStream outputStream = new FileOutputStream(fileSaveLocation);
-                mDriveService.files().get(fileId).executeMediaAndDownloadTo(outputStream);
+                drive.files().get(fileId).executeMediaAndDownloadTo(outputStream);
                 return null;
             }
         });

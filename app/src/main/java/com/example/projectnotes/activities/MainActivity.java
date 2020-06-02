@@ -35,19 +35,26 @@ import java.util.Iterator;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 
+/**
+ * Pantalla donde se cargan todas las notas
+ */
 public class MainActivity extends AppCompatActivity {
 
+    //Objetos de la interfaz
     private ListView listViewNotes;
     private EditText editTextSearch;
 
-    private ComponentNotes componentNotes;
-    private ArrayList<Note> listNotes;
+    private ComponentNotes componentNotes;          //Objeto que nos permite realizar las operaciones con la BDD
+    private ArrayList<Note> listNotes;              //ArrayList que contendrá todas las notas de la BDD
 
-    private int order = 1;
-    private final String SHA = "SHA-1";
-    public static boolean isPermission;
-    public static boolean isUpdate;
+    private int alphabeticalOrder = 1;              //Variable que controla el orden alfabetico
+    private final String SHA = "SHA-1";             //Constante que guarda el tipo de hash
+    public static boolean isPermission;             //Variable que controla los permisos
+    public static boolean isUpdate;                 //Variable que controla si hacemos un update o insert en el EditTextActivity
 
+    /**
+     * Se crea la interfaz del activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
         fillListView();
 
+        //Indicamos que el editTextSearch este pendiente del boton ENTER del teclado del usuario
         editTextSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -68,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Cuando se selecciona un item del ListView mostramos una ventana de dialogo
         listViewNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -83,6 +92,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Inicializamos los objetos de la interfaz, el objeto de la BDD y isUpdate
+     */
     private void init() {
         isUpdate = false;
 
@@ -92,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
         listViewNotes = (ListView) findViewById(R.id.listViewNotes);
     }
 
+    /**
+     * Pedimos los permisos al usuario
+     */
     private boolean validatePermissions() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return true;
@@ -105,6 +120,9 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    /**
+     * Comprobamos si se han concedido los permisos
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -117,6 +135,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Mostramos una ventana de advertencia en caso de que no se hayan concedido los permisos
+     */
     private void loadRecommendationDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Permisos Desactivados");
@@ -262,9 +283,9 @@ public class MainActivity extends AppCompatActivity {
     public void alphabeticalOrder(View view) {
         if (listNotes != null) {
             ArrayList<Note> listNotesCopy = (ArrayList<Note>) listNotes.clone();
-            switch (order) {
+            switch (alphabeticalOrder) {
                 case 1:
-                    order = 2;
+                    alphabeticalOrder = 2;
                     ArrayList<Note> listNotesSupport = new ArrayList<>();
                     ArrayList<String> notes = new ArrayList<>();
                     Iterator itr = listNotesCopy.iterator();
@@ -286,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
                     fillListView(listNotesSupport);
                     break;
                 case 2:
-                    order = 1;
+                    alphabeticalOrder = 1;
                     fillListView(listNotesCopy);
                     break;
 

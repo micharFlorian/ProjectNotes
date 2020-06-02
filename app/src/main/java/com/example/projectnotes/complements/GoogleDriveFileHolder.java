@@ -2,6 +2,9 @@ package com.example.projectnotes.complements;
 
 import com.google.api.client.util.DateTime;
 
+/*
+ *Clase con la que controlamos los ficheros de la copia de seguridad y la restauración de la base de datos
+ */
 public class GoogleDriveFileHolder {
 
     private String id;

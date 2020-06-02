@@ -6,11 +6,17 @@ import android.util.Log;
 
 import java.util.Locale;
 
+/**
+ *Clase que convierte un String a Voz
+ */
 public class TtsManager {
 
     private TextToSpeech mTts = null;
     private boolean isLoaded = false;
 
+    /**
+     * Inicializa el atributo mTts
+     */
     public void init(Context context) {
         try {
             mTts = new TextToSpeech(context, onInitListener);
@@ -19,6 +25,9 @@ public class TtsManager {
         }
     }
 
+    /**
+     * Carga el Idioma (castellano) y reproduce a voz un string
+     */
     private TextToSpeech.OnInitListener onInitListener = new TextToSpeech.OnInitListener() {
         @Override
         public void onInit(int status) {
@@ -31,31 +40,33 @@ public class TtsManager {
                     Log.e("error", "Este Lenguaje no esta permitido");
                 }
             } else {
-                Log.e("error", "Fallo al Inicilizar!");
+                Log.e("error", "Fallo al Inicilizar");
             }
         }
     };
 
+    /**
+     * Apaga el objeto para aue no consuma recursos del sistema
+     */
     public void shutDown() {
         mTts.shutdown();
     }
 
+    /**
+     * Detiene la reproducción
+     */
     public void stop() {
         mTts.stop();
     }
 
-    public void addQueue(String text) {
-        if (isLoaded)
-            mTts.speak(text, TextToSpeech.QUEUE_ADD, null);
-        else
-            Log.e("error", "TTS Not Initialized");
-    }
-
+    /**
+     * Carga el string que se va reproducir a voz
+     */
     public void initQueue(String text) {
 
         if (isLoaded)
             mTts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
         else
-            Log.e("error", "TTS Not Initialized");
+            Log.e("error", "Fallo al Inicilizar");
     }
 }
