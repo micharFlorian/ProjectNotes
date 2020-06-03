@@ -153,12 +153,19 @@ public class MainActivity extends AppCompatActivity {
         alertDialogBuilder.show();
     }
 
+    /**
+     * Buscamos una nota por su titulo a partir del String que ingrese el usuario en el editTextSearch
+     */
     private void performSearch() {
         if (listNotes != null) {
+
+            //Clonamos el ArrayList listNotes para no tener que hacer una consulta a la base de datos
             ArrayList<Note> notesCopy = (ArrayList<Note>) listNotes.clone();
             if (editTextSearch.getText().toString().isEmpty()) {
+                //Si editTextSearch está vacío y se le da al ENTER con el teclado volvemos a mostrar todas las notas
                 fillListView(notesCopy);
             } else {
+                //Buscamos todas las notas que coincidan con el String de editTextSearch
                 ArrayList<Note> notes = new ArrayList<Note>();
                 Iterator itr = notesCopy.iterator();
                 while (itr.hasNext()) {
@@ -172,11 +179,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /*
+     *Se crea el boton de Ajustes en el ActionBar
+     */
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
     }
 
+    /*
+     *Comprobamos si han seleccionado el boton de Ajuste y llamamos a SettingsActivity
+     */
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_settings:
@@ -187,24 +200,33 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
+     *Llamamos a EditTextActivity
+     */
     public void addNote(View view) {
         Intent intent = new Intent(MainActivity.this, EditTextActivity.class);
         startActivity(intent);
     }
 
+    /*
+     *Según el atributo Encode de Note mostramos el la ventana con las opciones de la nota o pedimos la contraseña
+     */
     private void showAlertDialog(final Note note) {
         switch (note.getEncode()) {
             case 0:
                 CharSequence[] options = {"Ver o Modificar", "Ocultar contenido", "Eliminar"};
-                alertDialog(note, options);
+                defaultAlertDialog(note, options);
                 break;
             case 1:
-                alertDialogPassword(note);
+                passwordAlertDialog(note);
                 break;
         }
     }
 
-    private void alertDialog(final Note note, final CharSequence[] options) {
+    /*
+     *Ventana de dialogo con las opciones de las notas
+     */
+    private void defaultAlertDialog(final Note note, final CharSequence[] options) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Seleccione una opción")
                 .setItems(options, new DialogInterface.OnClickListener() {
@@ -244,7 +266,10 @@ public class MainActivity extends AppCompatActivity {
         alertDialogBuilder.show();
     }
 
-    private void alertDialogPassword(final Note note) {
+    /*
+     *Ventana de dialogo que pide la contraseña
+     */
+    private void passwordAlertDialog(final Note note) {
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
         final View customLayout = getLayoutInflater().inflate(R.layout.dialog_password, null);
         alertDialog.setView(customLayout);
@@ -253,18 +278,10 @@ public class MainActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         EditText editTextPassword = customLayout.findViewById(R.id.editTextPassword);
-                        byte[] inputData = editTextPassword.getText().toString().getBytes();
-                        byte[] outputData = new byte[0];
-                        try {
-                            outputData = sha.encryptSHA(inputData, SHA);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        BigInteger shaData = new BigInteger(1, outputData);
                         User user = componentNotes.readUser(note.getUserId().getUserId());
-                        if (user.getPassword().equals(shaData.toString(16))) {
+                        if (user.getPassword().equals(sha.stringToHash(editTextPassword.getText().toString(), SHA))) {
                             CharSequence[] options = {"Ver o Modificar", "Mostrar contenido", "Eliminar"};
-                            alertDialog(note, options);
+                            defaultAlertDialog(note, options);
                         }
 
                     }
@@ -280,22 +297,31 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    /*
+     *Orden alfabetico de las notas
+     */
     public void alphabeticalOrder(View view) {
         if (listNotes != null) {
+            //Clonamos listNotes para que luego no tengamos que consultar la BDD
             ArrayList<Note> listNotesCopy = (ArrayList<Note>) listNotes.clone();
             switch (alphabeticalOrder) {
                 case 1:
+                    //Ordenamos las notas alfabeticamente
                     alphabeticalOrder = 2;
                     ArrayList<Note> listNotesSupport = new ArrayList<>();
-                    ArrayList<String> notes = new ArrayList<>();
+                    ArrayList<String> notes = new ArrayList<>();        //La usamos para guardar los titulos de las notas
                     Iterator itr = listNotesCopy.iterator();
                     while (itr.hasNext()) {
                         Note note = (Note) itr.next();
+                        //Añadimos al titulo de la nota su id separado por "," ("prueba,1")
                         notes.add(note.getTitle().toLowerCase() + "," + note.getNoteId().toString());
                     }
-                    Collections.sort(notes);
+                    Collections.sort(notes);        //Ordena alfabeticamente el ArrayList notes
                     itr = notes.iterator();
                     while (itr.hasNext()) {
+                        //Dividimos el String a partir de la "," y lo añadimos a un String[]
+                        //String[0] irá el titulo de la nota
+                        //String[1] irá el id de la nota
                         String[] titleId = itr.next().toString().split(",");
                         Iterator itrCopy = listNotesCopy.iterator();
                         while (itrCopy.hasNext()) {
@@ -307,6 +333,7 @@ public class MainActivity extends AppCompatActivity {
                     fillListView(listNotesSupport);
                     break;
                 case 2:
+                    //Deshacemos el orden alfabetico y mostramos las notas como estaban
                     alphabeticalOrder = 1;
                     fillListView(listNotesCopy);
                     break;
@@ -315,6 +342,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /*
+     *Consultamos todas las notas de la BDD y las añadimos al listViewNotes
+     */
     private void fillListView() {
         listNotes = componentNotes.readNotes();
         if (listNotes != null) {
@@ -326,6 +356,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /*
+     *Añadimos las notas que contenga el ArrayList al listViewNotes
+     */
     private void fillListView(ArrayList<Note> notes) {
         NotesListAdapter notesListAdapter = new NotesListAdapter(this,
                 R.layout.listview_item, notes);

@@ -11,11 +11,17 @@ import android.view.WindowManager;
 import com.example.projectnotes.R;
 import com.example.projectnotes.componentBd.ComponentNotes;
 
+/**
+ * Pantalla Splash
+ */
 public class SplashActivity extends AppCompatActivity {
 
     private static int SPLASH_TIME_OUT = 2000;
     public static String nameActivity = "SplashActivity";
 
+    /**
+     * Se carga la interfaz del activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +31,10 @@ public class SplashActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         ComponentNotes componentNotes = new ComponentNotes(this);
+
+        //Leemos el usuario de la BDD
+        //Si no hay un usuario lanzamos RegistryActivity
+        //En caso contrario lanzamos MainActivity
         if (componentNotes.readUsers() == null) {
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -44,6 +54,5 @@ public class SplashActivity extends AppCompatActivity {
                 }
             }, SPLASH_TIME_OUT);
         }
-
     }
 }

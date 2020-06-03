@@ -17,7 +17,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 
 /**
- * Clase que nos permite convertir un ArrayList<Note> en un ListView.
+ * Clase que nos permite ingresar los valores de un ArrayList<Note> en un ListView
  */
 public class NotesListAdapter extends ArrayAdapter<Note> {
 
@@ -32,8 +32,8 @@ public class NotesListAdapter extends ArrayAdapter<Note> {
     }
 
     /**
-     * Método en el que se obtiene un Objeto de la clase Note y se meten sus datos en el item del
-     * ListView.
+     * Método en el que se obtiene un Objeto de la clase Note, se leen sus atributos y se añaden a la
+     * vista del ListView
      */
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
@@ -43,11 +43,15 @@ public class NotesListAdapter extends ArrayAdapter<Note> {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = inflater.inflate(R.layout.listview_item, null);
         }
+
+        //Creamos los objetos de la interfaz
         TextView textViewId = (TextView) v.findViewById(R.id.textViewId);
         TextView textViewUserId = (TextView) v.findViewById(R.id.textViewUserId);
         TextView textViewEncode = (TextView) v.findViewById(R.id.textViewEncode);
         TextView textViewTitle = (TextView) v.findViewById(R.id.textViewTitle);
         TextView textViewDescription = (TextView) v.findViewById(R.id.textViewDescription);
+
+        //Dependiendo del valor de encode mostramos la descripcion de la nota
         switch (note.getEncode()) {
             case 0:
                 textViewId.setText(note.getNoteId().toString());

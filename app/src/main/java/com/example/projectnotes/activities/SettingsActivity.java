@@ -1,11 +1,19 @@
 package com.example.projectnotes.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+
 import com.example.projectnotes.R;
 
+/**
+ * Pantalla de Ajustes
+ */
 public class SettingsActivity extends AppCompatActivity {
 
+    /**
+     * Se carga la interfaz del activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

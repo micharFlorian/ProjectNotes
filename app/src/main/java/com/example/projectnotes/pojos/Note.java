@@ -2,6 +2,9 @@ package com.example.projectnotes.pojos;
 
 import java.io.Serializable;
 
+/*
+ *Clase POJO de la tabla NOTE de la BDD
+ */
 public class Note implements Serializable {
 
     private Integer noteId;

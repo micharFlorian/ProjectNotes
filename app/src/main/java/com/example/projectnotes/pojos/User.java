@@ -2,13 +2,17 @@ package com.example.projectnotes.pojos;
 
 import java.io.Serializable;
 
+/*
+ *Clase POJO de la tabla USER de la BDD
+ */
 public class User implements Serializable {
 
     private Integer userId;
     private String email;
     private String password;
 
-    public User() { }
+    public User() {
+    }
 
     public User(Integer userId) {
         this.userId = userId;

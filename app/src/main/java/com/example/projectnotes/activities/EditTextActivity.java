@@ -120,7 +120,7 @@ public class EditTextActivity extends AppCompatActivity {
             //Se comprueba que la nota tiene una imagen
             if (noteImage.getImage() != null) {
                 if (!Arrays.equals(noteImage.getImage(), imageViewToByte())) {
-                    //Se convierte el byte[] a Bitmap y se añaden a la imagen de la pantalla
+                    //Se convierte el byte[] a Bitmap y se añade a la imagen del Activity
                     Bitmap bitmap = BitmapFactory.decodeByteArray(noteImage.getImage(),
                             0, noteImage.getImage().length);
                     imageViewAttached.setImageBitmap(bitmap);

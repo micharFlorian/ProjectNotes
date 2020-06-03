@@ -38,7 +38,7 @@ import java.util.List;
 import static com.example.projectnotes.complements.DriveServiceHelper.getGoogleDriveService;
 
 /*
- *Clase donde se carga la interfaz
+ *Clase donde se carga la interfaz de Ajustes
  */
 public class SettingsFragment extends PreferenceFragment {
 
