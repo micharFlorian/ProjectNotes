@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import es.dmoral.toasty.Toasty;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -227,41 +228,41 @@ public class MainActivity extends AppCompatActivity {
      */
     private void defaultAlertDialog(final Note note, final CharSequence[] options) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Seleccione una opción")
-                .setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if (options[i].equals("Ver o Modificar")) {
-                            isUpdate = true;
-                            User user = componentNotes.readUser(note.getUserId().getUserId());
-                            note.setUserId(user);
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("note", note);
-                            Intent intent = new Intent(MainActivity.this, EditTextActivity.class);
-                            intent.putExtras(bundle);
-                            startActivity(intent);
-                        } else if (options[i].equals("Ocultar contenido")) {
-                            Note noteUpdate = componentNotes.readNote(note.getNoteId());
-                            noteUpdate.setEncode(1);
-                            if (componentNotes.updateNote(note.getNoteId(), noteUpdate) != 0) {
-                                fillListView();
-                                Toast.makeText(getApplicationContext(), "Contenido de la nota ocultado",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        } else if (options[i].equals("Mostrar contenido")) {
-                            Note noteUpdate = componentNotes.readNote(note.getNoteId());
-                            noteUpdate.setEncode(0);
-                            if (componentNotes.updateNote(note.getNoteId(), noteUpdate) != 0) {
-                                fillListView();
-                            }
-                        } else if (options[i].equals("Eliminar")) {
-                            if (componentNotes.deleteNote(note.getNoteId()) != 0) {
-                                fillListView();
-                                Toast.makeText(getApplicationContext(), "Nota Eliminada", Toast.LENGTH_SHORT).show();
-                            }
-                        }
+        alertDialogBuilder.setTitle("Seleccione una opción");
+        alertDialogBuilder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (options[i].equals("Ver o Modificar")) {
+                    isUpdate = true;
+                    User user = componentNotes.readUser(note.getUserId().getUserId());
+                    note.setUserId(user);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("note", note);
+                    Intent intent = new Intent(MainActivity.this, EditTextActivity.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                } else if (options[i].equals("Ocultar contenido")) {
+                    Note noteUpdate = componentNotes.readNote(note.getNoteId());
+                    noteUpdate.setEncode(1);
+                    if (componentNotes.updateNote(note.getNoteId(), noteUpdate) != 0) {
+                        fillListView();
+
+                        Toasty.normal(getApplicationContext(), "Contenido ocultado", Toast.LENGTH_SHORT).show();
                     }
-                });
+                } else if (options[i].equals("Mostrar contenido")) {
+                    Note noteUpdate = componentNotes.readNote(note.getNoteId());
+                    noteUpdate.setEncode(0);
+                    if (componentNotes.updateNote(note.getNoteId(), noteUpdate) != 0) {
+                        fillListView();
+                    }
+                } else if (options[i].equals("Eliminar")) {
+                    if (componentNotes.deleteNote(note.getNoteId()) != 0) {
+                        fillListView();
+                        Toasty.normal(getApplicationContext(), "Nota eliminada", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
         alertDialogBuilder.show();
     }
 

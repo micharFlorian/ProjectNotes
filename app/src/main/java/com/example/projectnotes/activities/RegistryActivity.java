@@ -1,6 +1,7 @@
 package com.example.projectnotes.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import es.dmoral.toasty.Toasty;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -122,7 +123,7 @@ public class RegistryActivity extends AppCompatActivity {
                 if (componentNotes.insertUser(user) != 0) {
                     goToMain();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Fallo al registrar el usuario",
+                    Toasty.normal(getApplicationContext(), "Fallo al registrar el usuario",
                             Toast.LENGTH_SHORT).show();
                 }
             } else {
@@ -149,7 +150,7 @@ public class RegistryActivity extends AppCompatActivity {
                 //Hacemos un update con la nueva contraseña
                 componentNotes.updateUser(user.getEmail(), new User(editTextEmail.getText().toString(),
                         passwordConvertHash(editTextNewPassword)));
-                Toast.makeText(getApplicationContext(), "Se ha cambiado la contraseña",
+                Toasty.normal(getApplicationContext(), "Se ha cambiado la contraseña",
                         Toast.LENGTH_SHORT).show();
                 goToSettings(new View(this));
             } else {

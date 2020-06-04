@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import es.dmoral.toasty.Toasty;
 
 import android.preference.Preference;
 import android.util.Log;
@@ -257,19 +258,19 @@ public class SettingsFragment extends PreferenceFragment {
                         public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
                             idFile = googleDriveFileHolder.getId();
                             progressDialog.dismiss();
-                            Toast.makeText(getActivity(), "Copia hecha", Toast.LENGTH_SHORT).show();
+                            Toasty.normal(getActivity(), "Copia hecha", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(getActivity(), "Hubo un problema con la copia",
+                            Toasty.normal(getActivity(), "Hubo un problema con la copia",
                                     Toast.LENGTH_SHORT).show();
                         }
                     });
         } else {
             progressDialog.dismiss();
-            Toast.makeText(getActivity(), "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
+            Toasty.normal(getActivity(), "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -313,7 +314,8 @@ public class SettingsFragment extends PreferenceFragment {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 progressDialog.dismiss();
-                                                Toast.makeText(getActivity(), "Datos restaurados", Toast.LENGTH_SHORT).show();
+                                                Toasty.normal(getActivity(), "Datos restaurados",
+                                                        Toast.LENGTH_SHORT).show();
                                                 Log.d(TAG, "onSuccesDownload: ");
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
@@ -324,20 +326,20 @@ public class SettingsFragment extends PreferenceFragment {
                                 });
                             } else {
                                 progressDialog.dismiss();
-                                Toast.makeText(getActivity(), "No hay copias en su cuenta",
+                                Toasty.normal(getActivity(), "No hay copias en su cuenta",
                                         Toast.LENGTH_SHORT).show();
                             }
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getActivity(), "Hubo un problema con la copia",
+                    Toasty.normal(getActivity(), "Hubo un problema con la copia",
                             Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
             progressDialog.dismiss();
-            Toast.makeText(getActivity(), "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
+            Toasty.normal(getActivity(), "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
         }
     }
 
