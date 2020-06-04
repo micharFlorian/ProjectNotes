@@ -12,10 +12,9 @@ import android.widget.Toast;
 
 import com.example.projectnotes.R;
 import com.example.projectnotes.componentBd.ComponentNotes;
-import com.example.projectnotes.hash.sha;
+import com.example.projectnotes.hash.Sha;
 import com.example.projectnotes.pojos.User;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -163,7 +162,7 @@ public class RegistryActivity extends AppCompatActivity {
      * Convierte el contenido del EditText en un Hash tipo SHA-1
      */
     private String passwordConvertHash(EditText editText) {
-        return sha.stringToHash(editText.getText().toString(), SHA);
+        return Sha.stringToHash(editText.getText().toString(), SHA);
     }
 
     /**

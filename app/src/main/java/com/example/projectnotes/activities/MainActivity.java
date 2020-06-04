@@ -24,11 +24,10 @@ import android.widget.Toast;
 import com.example.projectnotes.R;
 import com.example.projectnotes.adapters.NotesListAdapter;
 import com.example.projectnotes.componentBd.ComponentNotes;
-import com.example.projectnotes.hash.sha;
+import com.example.projectnotes.hash.Sha;
 import com.example.projectnotes.pojos.Note;
 import com.example.projectnotes.pojos.User;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -279,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         EditText editTextPassword = customLayout.findViewById(R.id.editTextPassword);
                         User user = componentNotes.readUser(note.getUserId().getUserId());
-                        if (user.getPassword().equals(sha.stringToHash(editTextPassword.getText().toString(), SHA))) {
+                        if (user.getPassword().equals(Sha.stringToHash(editTextPassword.getText().toString(), SHA))) {
                             CharSequence[] options = {"Ver o Modificar", "Mostrar contenido", "Eliminar"};
                             defaultAlertDialog(note, options);
                         }

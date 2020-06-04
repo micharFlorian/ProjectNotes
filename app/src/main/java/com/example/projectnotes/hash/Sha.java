@@ -6,7 +6,7 @@ import java.security.MessageDigest;
 /**
  * Clase que permite hashear
  */
-public class sha {
+public class Sha {
 
     /**
      * Convierte un byte[] en un hash  (SHA-1,SHA-224,SHA-256,SHA-384,SHA-512)
@@ -25,7 +25,7 @@ public class sha {
         byte[] inputData = string.getBytes();
         byte[] outputData = new byte[0];
         try {
-            outputData = sha.encryptSHA(inputData, SHA);
+            outputData = Sha.encryptSHA(inputData, SHA);
         } catch (Exception e) {
             e.printStackTrace();
         }
