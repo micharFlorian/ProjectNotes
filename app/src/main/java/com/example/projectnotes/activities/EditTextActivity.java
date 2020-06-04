@@ -1,6 +1,7 @@
 package com.example.projectnotes.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import es.dmoral.toasty.Toasty;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -184,7 +185,7 @@ public class EditTextActivity extends AppCompatActivity {
             intent.setType("image/");
             startActivityForResult(intent.createChooser(intent, "Selecione la Aplicación"), 10);
         } else {
-            Toast.makeText(getApplicationContext(), "La aplicación no tiene permisos " +
+            Toasty.normal(getApplicationContext(), "La aplicación no tiene permisos " +
                     "para abrir la galería", Toast.LENGTH_SHORT).show();
         }
     }
