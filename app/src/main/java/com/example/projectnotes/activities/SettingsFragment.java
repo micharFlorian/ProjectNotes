@@ -316,12 +316,10 @@ public class SettingsFragment extends PreferenceFragment {
                                                 progressDialog.dismiss();
                                                 Toasty.normal(getActivity(), "Datos restaurados",
                                                         Toast.LENGTH_SHORT).show();
-                                                Log.d(TAG, "onSuccesDownload: ");
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Log.d(TAG, "onFailure: " + e.getMessage());
                                     }
                                 });
                             } else {
