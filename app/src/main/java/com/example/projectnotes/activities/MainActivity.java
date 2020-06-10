@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Permisos Desactivados");
         alertDialogBuilder.setMessage("Debe aceptar los permisos para el correcto funcionamiento" +
-                "de la aplicación");
+                " de la aplicación");
         alertDialogBuilder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
             @Override
             @RequiresApi(api = Build.VERSION_CODES.M)
